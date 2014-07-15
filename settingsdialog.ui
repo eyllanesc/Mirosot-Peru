@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SettingsDialog</class>
+ <widget class="QDialog" name="SettingsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>556</width>
+    <height>352</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Settings</string>
+  </property>
+  <widget class="QGroupBox" name="parametersBox">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>30</y>
+     <width>201</width>
+     <height>205</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Select Parameters</string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QLabel" name="baudRateLabel">
+      <property name="text">
+       <string>BaudRate:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="baudRateBox"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="dataBitsLabel">
+      <property name="text">
+       <string>Data bits:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="dataBitsBox"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="parityLabel">
+      <property name="text">
+       <string>Parity:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QComboBox" name="parityBox"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="stopBitsLabel">
+      <property name="text">
+       <string>Stop bits:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QComboBox" name="stopBitsBox"/>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="flowControlLabel">
+      <property name="text">
+       <string>Flow control:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QComboBox" name="flowControlBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="selectBox">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>311</width>
+     <height>227</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Select Serial Port</string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="0">
+     <widget class="QLabel" name="manufacturerLabel">
+      <property name="text">
+       <string>Manufacturer:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="descriptionLabel">
+      <property name="text">
+       <string>Description:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="pidLabel">
+      <property name="text">
+       <string>Product ID:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="vidLabel">
+      <property name="text">
+       <string>Vendor ID:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="locationLabel">
+      <property name="text">
+       <string>Location:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="serialNumberLabel">
+      <property name="text">
+       <string>Serial number:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QComboBox" name="serialPortInfoListBox"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="additionalOptionsGroupBox">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>242</y>
+     <width>123</width>
+     <height>62</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Additional options</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QCheckBox" name="localEchoCheckBox">
+      <property name="text">
+       <string>Local echo</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>21</x>
+     <y>301</y>
+     <width>481</width>
+     <height>33</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>228</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QDialogButtonBox" name="okCancelBox">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="standardButtons">
+       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>okCancelBox</sender>
+   <signal>accepted()</signal>
+   <receiver>SettingsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>325</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>okCancelBox</sender>
+   <signal>rejected()</signal>
+   <receiver>SettingsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>325</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>181</x>
+     <y>175</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

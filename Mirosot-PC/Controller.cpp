@@ -54,7 +54,7 @@ void Controller::stopSendThread()
 {
     qDebug() << "About to stop send thread...";
     sendThread->stopSendThread();
-    sendThread->wait();
+    //sendThread->wait();
     qDebug() << "Send thread successfully stopped.";
 }
 void Controller::stopCaptureThread()

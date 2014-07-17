@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>CameraConnectDialog</class>
  <widget class="QDialog" name="CameraConnectDialog">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,16 +25,22 @@
     <height>170</height>
    </size>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::NoFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Connect to Camera</string>
   </property>
-  <widget class="QWidget" name="">
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>22</x>
      <y>18</y>
      <width>341</width>
-     <height>171</height>
+     <height>178</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">

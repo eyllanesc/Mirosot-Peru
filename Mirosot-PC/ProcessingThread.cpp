@@ -21,6 +21,11 @@ ProcessingThread::ProcessingThread(ImageBuffer *imageBuffer, int inputSourceWidt
     currentROI=cv::Rect(0,0,inputSourceWidth,inputSourceHeight);
     // Store original ROI
     originalROI=currentROI;
+    isPos=false;
+    initial.x=-10;
+    initial.y=-10;
+    final.x=-10;
+    final.y=-10;
 } // ProcessingThread constructor
 
 ProcessingThread::~ProcessingThread()
@@ -34,7 +39,7 @@ void ProcessingThread::run()
     bg.set("detectShadows",false);
     cv::Mat fore;
     cv::Mat foreandcolor;
-    int mynumber=0;
+    float angle=0;
     while(true)
     {
 
@@ -60,6 +65,10 @@ void ProcessingThread::run()
         cv::Mat currentFrame=imageBuffer->getFrame();
         // Make copy of current frame (processing will be performed on this copy)
         currentFrame.copyTo(currentFrameCopy);
+
+        line(currentFrameCopy, initial, final, CV_RGB(255, 255, 0), 2, CV_AA);
+        circle(currentFrameCopy , initial, 3, CV_RGB(255, 0, 255), 2, CV_AA);
+        circle(currentFrameCopy , final, 3, CV_RGB(0, 255, 255), 2, CV_AA);
         // Set ROI of currentFrameCopy
         //currentFrameCopy.locateROI(frameSize,framePoint);
         //currentFrameCopy.adjustROI(-currentROI.y,-(frameSize.height-currentROI.height-currentROI.y),                           -currentROI.x,-(frameSize.width-currentROI.width-currentROI.x));
@@ -153,12 +162,14 @@ void ProcessingThread::run()
         // Update statistics
         updateFPS(processingTime);
         currentSizeOfBuffer=imageBuffer->getSizeOfImageBuffer();
-
-        data=QString::number(mynumber);
-        mynumber++;
-        // Inform controller of new frame (QImage)
+        if(isPos)
+        {
+            angle=cv::fastAtan2(final.y-initial.y,final.x-initial.x);
+            data=QString::number(angle-180);
+            emit newData(data);
+        }
         emit newFrame(frame);
-        emit newData(data);
+
     }
     qDebug() << "Stopping processing thread...";
 }
@@ -215,36 +226,46 @@ void ProcessingThread::resetROI()
 void ProcessingThread::updateProcessingFlags(struct ProcessingFlags processingFlags)
 {
     QMutexLocker locker(&updateMembersMutex);
-    this->bsOn=processingFlags.bsOn;
-    this->colorOn=processingFlags.colorOn;
+    bsOn=processingFlags.bsOn;
+    colorOn=processingFlags.colorOn;
 } // updateProcessingFlags()
 
 void ProcessingThread::updateProcessingSettings(struct ProcessingSettings processingSettings)
 {
     QMutexLocker locker(&updateMembersMutex);
-    this->ColorType=processingSettings.ColorType;
-    this->ColorParam1 = processingSettings.ColorParam1;
-    this->ColorParam2 = processingSettings.ColorParam2;
-    this->ColorParam3 = processingSettings.ColorParam3;
-    this->ColorParam1_2 = processingSettings.ColorParam1_2;
-    this->ColorParam2_2 = processingSettings.ColorParam2_2;
-    this->ColorParam3_2 = processingSettings.ColorParam3_2;
-    this->BSNumberOfIterations=processingSettings.BSNumberOfIterations;
+    ColorType=processingSettings.ColorType;
+    ColorParam1 = processingSettings.ColorParam1;
+    ColorParam2 = processingSettings.ColorParam2;
+    ColorParam3 = processingSettings.ColorParam3;
+    ColorParam1_2 = processingSettings.ColorParam1_2;
+    ColorParam2_2 = processingSettings.ColorParam2_2;
+    ColorParam3_2 = processingSettings.ColorParam3_2;
+    BSNumberOfIterations=processingSettings.BSNumberOfIterations;
 } // updateProcessingSettings()
+
+void ProcessingThread::updatePosData(struct PosData posData)
+{
+    QMutexLocker locker(&updateMembersMutex);
+    initial.x=posData.initial.x();
+    initial.y=posData.initial.y();
+    final.x=posData.final.x();
+    final.y=posData.final.y();
+    isPos=true;
+}
 
 void ProcessingThread::updateTaskData(struct TaskData taskData)
 {
     QMutexLocker locker(&updateMembersMutex);
-    this->setROIFlag=taskData.setROIFlag;
-    this->resetROIFlag=taskData.resetROIFlag;
-    this->selectionBox.x=taskData.selectionBox.left();
-    qDebug()<<taskData.selectionBox.left();
-    qDebug()<<taskData.selectionBox.right();
-    qDebug()<<taskData.selectionBox.bottom();
-    qDebug()<<taskData.selectionBox.top();
-    this->selectionBox.y=taskData.selectionBox.top();
-    this->selectionBox.width=taskData.selectionBox.width();
-    this->selectionBox.height=taskData.selectionBox.height();
+    setROIFlag=taskData.setROIFlag;
+    resetROIFlag=taskData.resetROIFlag;
+    selectionBox.x=taskData.selectionBox.left();
+    //qDebug()<<taskData.selectionBox.left();
+    //qDebug()<<taskData.selectionBox.right();
+    //qDebug()<<taskData.selectionBox.bottom();
+    //qDebug()<<taskData.selectionBox.top();
+    selectionBox.y=taskData.selectionBox.top();
+    selectionBox.width=taskData.selectionBox.width();
+    selectionBox.height=taskData.selectionBox.height();
 } // updateTaskData()
 
 int ProcessingThread::getAvgFPS()

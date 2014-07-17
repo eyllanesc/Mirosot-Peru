@@ -19,6 +19,8 @@ class SendThread : public QThread
     Q_OBJECT
 public:
     SendThread(QString);
+
+    QByteArray qbytearray;
     void receive(QString);
     bool connectToserial(Settings);
     void disconnectSerial();
@@ -31,7 +33,7 @@ private:
     volatile bool stopped;
     QMutex stoppedMutex;
 protected:
-    //void run();
+    void run();
 };
 
 #endif // SENDTHREAD_H

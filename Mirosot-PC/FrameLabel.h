@@ -25,6 +25,8 @@ private:
     QPoint mouseCursorPos;
     bool drawBox;
     QRect *box;
+    QPoint initial;
+    QPoint final;
 protected:
     void mouseMoveEvent(QMouseEvent *ev);
     void mousePressEvent(QMouseEvent *ev);

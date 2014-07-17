@@ -6,7 +6,7 @@
 #ifndef PROCESSINGSETTINGSDIALOG_H
 #define PROCESSINGSETTINGSDIALOG_H
 
-#include "ui_ProcessingSettingsDialog.h"
+//#include "ui_ProcessingSettingsDialog.h"
 
 // My header
 #include "Config.h"
@@ -14,16 +14,19 @@
 
 // Qt header files
 #include <QtGui>
+namespace Ui {
+class ProcessingSettingsDialog;
+}
 
-
-class ProcessingSettingsDialog : public QDialog, private Ui::ProcessingSettingsDialog
+class ProcessingSettingsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    ProcessingSettingsDialog(QWidget *parent = 0);
+    explicit ProcessingSettingsDialog(QWidget *parent = 0);
     void updateDialogSettingsFromStored();
 private:
+    Ui::ProcessingSettingsDialog *ui;
     ProcessingSettings processingSettings;
 public slots:
     void resetAllDialogToDefaults();

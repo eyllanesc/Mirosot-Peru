@@ -6,6 +6,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+namespace Ui {
+class MainWindow;
+}
+
 #include "ui_MainWindow.h"
 
 //My header
@@ -26,7 +30,7 @@ class ProcessingSettingsDialog;
 class Controller;
 class SettingsDialog;
 
-class MainWindow : public QMainWindow, private Ui::MainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -39,25 +43,30 @@ public:
     void initializeGUI();
     void signalSlotsInit();
 private:
+     Ui::MainWindow *ui;
     CameraConnectDialog *cameraConnectDialog;
     ProcessingSettingsDialog *processingSettingsDialog;
     SettingsDialog *settingsDialog;
     Controller *controller;
     ProcessingFlags processingFlags;
     TaskData taskData;
+    PosData posData;
     QString appVersion;
     int sourceWidth;
     int sourceHeight;
-    int deviceNumber;
 
+    int deviceNumber;
     int imageBufferSize;
+    Settings settings;
     bool isCameraConnected;
     bool isPortConnected;
+
+    bool isCamera;
+    bool isSerial;
 public slots:
+    void connectToStart();
     void connectToCamera();
-    void disconnectCamera();
     void connectToSerial();
-    void disconnectSerial();
     void about();
     void clearImageBuffer();
     void setBS(bool);
@@ -67,10 +76,12 @@ public slots:
     void newMouseData(struct MouseData);
 private slots:
     void updateFrame(const QImage &frame);
-    void updateData(QString data);
+    void updateData(const QString data);
+    void readData();
 signals:
     void newProcessingFlags(struct ProcessingFlags p_flags);
     void newTaskData(struct TaskData taskData);
+    void newPosData(struct PosData posData);
 };
 
 #endif // MAINWINDOW_H

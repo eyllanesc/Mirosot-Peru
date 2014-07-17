@@ -50,3 +50,6 @@ unix: PKGCONFIG += opencv \
 
 OTHER_FILES += \
     README.md
+
+RESOURCES += \
+    MyResource.qrc

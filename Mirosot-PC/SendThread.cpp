@@ -26,7 +26,8 @@ bool SendThread::connectToserial(Settings settings)
 
 void SendThread::receive(QString mydata)
 {
-    serial->write(mydata.toLocal8Bit());
+    qbytearray=mydata.toLocal8Bit();
+    serial->write(qbytearray);
 }
 bool SendThread::isPortConnected()
 {
@@ -38,9 +39,11 @@ void SendThread::disconnectSerial()
     if(!(serial->error()==QSerialPort::ResourceError))
     {
         serial->close();
+        qDebug() << "Serial successfully disconnected.";
     }
+
 }
-/*void SendThread::run()
+void SendThread::run()
 {
     while(true)
     {
@@ -61,7 +64,7 @@ void SendThread::disconnectSerial()
         serial->write(databyte);
     }
     qDebug() << "Stopping send thread...";
-}*/
+}
 
 void SendThread::stopSendThread()
 {

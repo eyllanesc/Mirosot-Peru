@@ -44,11 +44,17 @@ struct TaskData{
 
 // MouseData structure definition
 struct MouseData{
+    QPoint initial;
+    QPoint final;
     QRect selectionBox;
     bool leftButtonRelease;
     bool rightButtonRelease;
 };
 
+struct PosData{
+    QPoint initial;
+    QPoint final;
+};
 struct Settings {
     QString name;
     qint32 baudRate;

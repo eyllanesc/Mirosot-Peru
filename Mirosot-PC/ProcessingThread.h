@@ -74,15 +74,21 @@ private:
     bool setROIFlag;
     bool resetROIFlag;
     cv::Rect selectionBox;
+
+    cv::Point initial;
+    cv::Point final;
+    bool isPos;
+
 protected:
     void run();
 private slots:
     void updateProcessingFlags(struct ProcessingFlags);
     void updateProcessingSettings(struct ProcessingSettings);
     void updateTaskData(struct TaskData);
+    void updatePosData(struct PosData);
 signals:
     void newFrame(const QImage &frame);
-    void newData(QString data);
+    void newData(const QString data);
 };
 
 #endif // PROCESSINGTHREAD_H

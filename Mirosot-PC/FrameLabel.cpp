@@ -26,8 +26,8 @@ void FrameLabel::mouseMoveEvent(QMouseEvent *ev)
     // Update box width and height if box drawing is in progress
     if(drawBox)
     {
-        //qDebug()<<getMouseCursorPos().x();
-        //qDebug()<<getMouseCursorPos().y();
+        final.setX(getMouseCursorPos().x());
+        final.setY(getMouseCursorPos().y());
         box->setWidth(getMouseCursorPos().x()-startPoint.x());
         box->setHeight(getMouseCursorPos().y()-startPoint.y());
     }
@@ -66,6 +66,11 @@ void FrameLabel::mouseReleaseEvent(QMouseEvent *ev)
             // Set leftButtonRelease flag to TRUE
             mouseData.leftButtonRelease=true;
             // Inform main window of event
+            mouseData.initial.setX(initial.x());
+            mouseData.initial.setY(initial.y());
+            mouseData.final.setX(final.x());
+            mouseData.final.setY(final.y());
+
             emit newMouseData(mouseData);
         }
         // Set leftButtonRelease flag to FALSE
@@ -82,6 +87,10 @@ void FrameLabel::mouseReleaseEvent(QMouseEvent *ev)
             // Set rightButtonRelease flag to TRUE
             mouseData.rightButtonRelease=true;
             // Inform main window of event
+            mouseData.initial.setX(initial.x());
+            mouseData.initial.setY(initial.y());
+            mouseData.final.setX(initial.x());
+            mouseData.final.setY(initial.y());
             emit newMouseData(mouseData);
             // Set rightButtonRelease flag to FALSE
             mouseData.rightButtonRelease=false;
@@ -97,6 +106,8 @@ void FrameLabel::mousePressEvent(QMouseEvent *ev)
     {
         // Start drawing box
         startPoint=ev->pos();
+        initial.setX(startPoint.x());
+        initial.setY(startPoint.y());
         box=new QRect(startPoint.x(),startPoint.y(),0,0);
         drawBox=true;
     }

@@ -13,6 +13,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     // Setup user interface
     ui->setupUi(this);
+    //QPalette Pal(palette());
+    // Asignar el color de fondo como Negro
+    //Pal.setColor(QPalette::Background, QColor::fromRgb(129, 0, 49 ));
+    //Pal.setColor(QPalette::Foreground , QColor::fromRgb(0, 0, 0 ));
+    //Pal.setColor(QPalette::Dark , QColor::fromRgb(100, 10, 90 ));
+    //setAutoFillBackground(true);
+    //setPalette(Pal);
     // Create controller
     controller = new Controller;
     // Save application version in QString variable
@@ -137,8 +144,10 @@ void MainWindow::connectToStart()
             // Setup imageBufferBar in main window with minimum and maximum values
             ui->imageBufferBar->setMinimum(0);
             ui->imageBufferBar->setMaximum(imageBufferSize);
-            //
+
+            ui->menuCalibration->setDisabled(false);
             ui->processingMenu->setDisabled(false);
+
             // Enable "Clear Image Buffer" push button in main window
             ui->clearImageBufferButton->setDisabled(false);
             // Get input stream properties
@@ -214,11 +223,13 @@ void MainWindow::connectToStart()
                     controller->deleteImageBuffer();
                     // Enable/Disable appropriate menu items
                     ui->processingMenu->setDisabled(true);
+                    ui->menuCalibration->setDisabled(true);
                     ui->CameraAction->setDisabled(false);
                     // Set GUI in main window
                     ui->BSAction->setChecked(false);
-                    ui->ColorAction->setChecked(false);
+                    //ui->ColorAction->setChecked(false);
                     ui->frameLabel->setText("No camera connected.");
+                    ui->frameLabel_2->setText("No camera connected.");
                     ui->imageBufferBar->setValue(0);
                     ui->imageBufferLabel->setText("[000/000]");
                     ui->captureRateLabel->setText("");
@@ -253,14 +264,13 @@ void MainWindow::updateData(const QString data)
     controller->sendThread->receive(data);
     ui->datalabel->setText(data);
 }
+
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("App Mirosot Peru"),
                        tr("<BR>"
                           "<b>Author:</b> Edwin Christian Yllanes Cucho<br>"
                           "<b>Email:</b> <a href='mailto:e.yllanescucho@ieee.org'>e.yllanescucho@ieee.org</a><br><b>Version</b>: ")+appVersion+tr("<br>  <b>Organization:</b> RAS IEEE UNI"));
-
-//    QMessageBox::information(this,"About",QString("Created by <b>Edwin Christian Yllanes cucho<\b> \n\nContact: <e.yllanescucho@ieee.org>\nWebsite: RAS-IEEE UNI\n\nVersion: ")+appVersion);
 } // about()
 
 void MainWindow::clearImageBuffer()
@@ -313,6 +323,7 @@ void MainWindow::updateFrame(const QImage &frame)
                       QString("x")+QString::number(controller->processingThread->getCurrentROI().height));
     // Display frame in main window
     ui->frameLabel->setPixmap(QPixmap::fromImage(frame));
+    ui->frameLabel_2->setPixmap(QPixmap::fromImage(frame));
 } // updateFrame()
 
 void MainWindow::setProcessingSettings()
@@ -423,6 +434,7 @@ void MainWindow::initializeGUI()
     ui->exitAction->setDisabled(false);
     ui->StartAction->setDisabled(true);
     ui->processingMenu->setDisabled(true);
+    ui->menuCalibration->setDisabled(true);
     //StopAction->setDisabled(true);
 } // initializeGUI()
 
@@ -430,8 +442,9 @@ void MainWindow::setInitGUIState()
 {
     // Set GUI in main window
     ui->BSAction->setChecked(false);
-    ui->ColorAction->setChecked(false);
+    //ui->ColorAction->setChecked(false);
     ui->frameLabel->setText("No camera connected.");
+    ui->frameLabel_2->setText("No camera connected.");
     ui->imageBufferBar->setValue(0);
     ui->imageBufferLabel->setText("[000/000]");
     ui->captureRateLabel->setText("");
@@ -452,7 +465,7 @@ void MainWindow::signalSlotsInit()
     connect(ui->StartAction, SIGNAL(triggered()),this, SLOT(connectToStart()));
 
     connect(ui->BSAction,SIGNAL(toggled(bool)), this, SLOT(setBS(bool)));
-    connect(ui->ColorAction,SIGNAL(toggled(bool)), this, SLOT(setColor(bool)));
+    //connect(ui->ColorAction,SIGNAL(toggled(bool)), this, SLOT(setColor(bool)));
 
     connect(ui->settingsAction, SIGNAL(triggered()), this, SLOT(setProcessingSettings()));
     connect(ui->aboutAction, SIGNAL(triggered()), this, SLOT(about()));

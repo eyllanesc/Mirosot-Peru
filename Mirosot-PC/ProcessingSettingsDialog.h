@@ -14,6 +14,10 @@
 
 // Qt header files
 #include <QtGui>
+
+#include <QDialog>
+#include <qxtspanslider.h>
+
 namespace Ui {
 class ProcessingSettingsDialog;
 }

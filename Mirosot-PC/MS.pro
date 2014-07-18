@@ -4,7 +4,8 @@
 #				      <e.yllanescucho@gmail.com>    #
 #####################################################################
 QT       += core gui
-
+CONFIG  += qxt
+QXT     += core gui
 TARGET = MS
 
 TEMPLATE = app

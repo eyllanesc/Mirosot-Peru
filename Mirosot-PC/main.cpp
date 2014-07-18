@@ -8,7 +8,7 @@
 
 // Qt header files
 #include <QtGui/QApplication>
-
+#include <QtGui>
 #define X_INITIAL 0
 #define Y_INITIAL 0
 
@@ -18,7 +18,6 @@ int main(int argc, char *argv[])
     a.setApplicationVersion(QUOTE(APP_VERSION));
     MainWindow w;
     w.show();
-    // Set the initial screen position of the main window
     w.setGeometry(X_INITIAL, Y_INITIAL, w.width(), w.height());
     return a.exec();
 } // main()

@@ -5,5 +5,7 @@
         <file>images/camera-web.png</file>
         <file>images/exit.png</file>
         <file>images/system-help.png</file>
+        <file>images/serial.jpg</file>
+        <file>images/Qt-logo.png</file>
     </qresource>
 </RCC>

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>556</width>
-    <height>352</height>
+    <width>548</width>
+    <height>267</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>30</y>
+     <y>10</y>
      <width>201</width>
      <height>205</height>
     </rect>
@@ -82,10 +82,16 @@
    <property name="geometry">
     <rect>
      <x>9</x>
-     <y>9</y>
+     <y>10</y>
      <width>311</width>
      <height>227</height>
     </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>290</width>
+     <height>0</height>
+    </size>
    </property>
    <property name="title">
     <string>Select Serial Port</string>
@@ -100,6 +106,12 @@
     </item>
     <item row="1" column="0">
      <widget class="QLabel" name="descriptionLabel">
+      <property name="minimumSize">
+       <size>
+        <width>280</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="text">
        <string>Description:</string>
       </property>
@@ -134,69 +146,38 @@
      </widget>
     </item>
     <item row="0" column="0">
-     <widget class="QComboBox" name="serialPortInfoListBox"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QGroupBox" name="additionalOptionsGroupBox">
-   <property name="geometry">
-    <rect>
-     <x>9</x>
-     <y>242</y>
-     <width>123</width>
-     <height>62</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Additional options</string>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QCheckBox" name="localEchoCheckBox">
-      <property name="text">
-       <string>Local echo</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>21</x>
-     <y>301</y>
-     <width>481</width>
-     <height>33</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
+     <widget class="QComboBox" name="serialPortInfoListBox">
+      <property name="minimumSize">
        <size>
-        <width>228</width>
-        <height>20</height>
+        <width>100</width>
+        <height>0</height>
        </size>
       </property>
-     </spacer>
-    </item>
-    <item>
-     <widget class="QDialogButtonBox" name="okCancelBox">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
       </property>
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QDialogButtonBox" name="okCancelBox">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>220</y>
+     <width>176</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
   </widget>
  </widget>
  <resources/>

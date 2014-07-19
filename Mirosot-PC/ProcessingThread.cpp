@@ -231,7 +231,10 @@ void ProcessingThread::updateProcessingFlags(struct ProcessingFlags processingFl
     rgbOn=processingFlags.rgbOn;
     hsvOn=processingFlags.hsvOn;
     ycrcbOn=processingFlags.ycrcbOn;
-
+    teamOn=processingFlags.teamOn;
+    robot1On=processingFlags.robot1On;
+    robot2On=processingFlags.robot2On;
+    ballOn=processingFlags.ballOn;
 } // updateProcessingFlags()
 
 void ProcessingThread::updateProcessingSettings(struct ProcessingSettings processingSettings)

@@ -14,11 +14,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     // Setup user interface
     ui->setupUi(this);
     isPlay=false;
+    ui->ledIndicator_1->setDisabled(true);
     //ui->on_off->setText("Play");
     playCtl = new QPushButton(this);
     playCtl->setIcon(QIcon(QPixmap("/home/edwin/Documents/MS/images/connect.png")));
     playCtl->setIconSize(QSize(25, 25));
-    connect(playCtl,SIGNAL(clicked()),this,SLOT(play()));
     playCtl->setStyleSheet("QPushButton{border: none;outline: none;}");
     playCtl->move(1000,600);
     playCtl->setDisabled(true);
@@ -139,10 +139,6 @@ void MainWindow::readData()
 
 }
 
-void MainWindow::connectToPlay()
-{
-
-}
 void MainWindow::connectToStart()
 {
     if(QString::compare(ui->StartAction->text(),"Connect",Qt::CaseSensitive)==0)
@@ -440,7 +436,10 @@ void MainWindow::initializeProcessingFlagsStructure()
     processingFlags.rgbOn=false;
     processingFlags.hsvOn=false;
     processingFlags.ycrcbOn=false;
-
+    processingFlags.teamOn=false;
+    processingFlags.robot1On=false;
+    processingFlags.robot2On=false;
+    processingFlags.ballOn=false;
 } // initializeProcessingFlagsStructure()
 
 void MainWindow::initializeTaskDataStructure()
@@ -661,6 +660,22 @@ void MainWindow::setObject(int type)
 }
 void MainWindow::play()
 {
-    isPlay=!isPlay;
+    ui->ledIndicator_1->toggle();
+    if(isPlay)
+    {
+        isPlay=false;
+        ui->actionTeam->setChecked(false);
+        ui->actionRobot1->setChecked(false);
+        ui->actionRobot2->setChecked(false);
+        ui->actionBall->setChecked(false);
+        processingFlags.teamOn=false;
+        processingFlags.robot1On=false;
+        processingFlags.robot2On=false;
+        processingFlags.ballOn=false;
+    }
+    else if(!isPlay)
+    {
+        isPlay=true;
+    }
     emit newProcessingFlags(processingFlags);
 }

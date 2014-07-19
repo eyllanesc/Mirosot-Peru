@@ -43,9 +43,8 @@ public:
     void setInitGUIState();
     void initializeGUI();
     void signalSlotsInit();
-    void connectToPlay();
 private:
-     Ui::MainWindow *ui;
+    Ui::MainWindow *ui;
     CameraConnectDialog *cameraConnectDialog;
     ProcessingSettingsDialog *processingSettingsDialog;
     SettingsDialog *settingsDialog;
@@ -79,6 +78,7 @@ private:
     void setObject(int);
 
 public slots:
+    void play();
     void connectToStart();
     void connectToCamera();
     void connectToSerial();
@@ -92,7 +92,6 @@ private slots:
     void updateFrame(const QImage &frame);
     void updateData(const QString data);
     void readData();
-    void play();
 
     void setTeam(bool);
     void setRobot1(bool);

@@ -65,16 +65,42 @@
      <height>0</height>
     </size>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>23</x>
-      <y>15</y>
+      <x>1300</x>
+      <y>359</y>
+      <width>20</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>20</width>
+      <height>20</height>
+     </size>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_4"/>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>20</y>
       <width>1296</width>
       <height>597</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
@@ -702,19 +728,6 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>30</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -726,6 +739,80 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_2">
+             <property name="title">
+              <string/>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0">
+               <layout class="QHBoxLayout" name="layoutPlugin_2">
+                <item>
+                 <widget class="QLedIndicator" name="ledIndicator_1" native="true">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Led indicator/button</string>
+                  </property>
+                  <property name="whatsThis">
+                   <string>Led indicator/button</string>
+                  </property>
+                  <property name="checked" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                  <property name="onColor1" stdset="0">
+                   <color>
+                    <red>255</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </property>
+                  <property name="onColor2" stdset="0">
+                   <color>
+                    <red>176</red>
+                    <green>0</green>
+                    <blue>2</blue>
+                   </color>
+                  </property>
+                  <property name="offColor1" stdset="0">
+                   <color>
+                    <red>28</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </property>
+                  <property name="offColor2" stdset="0">
+                   <color>
+                    <red>156</red>
+                    <green>0</green>
+                    <blue>2</blue>
+                   </color>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
@@ -950,6 +1037,11 @@
    <class>FrameLabel</class>
    <extends>QLabel</extends>
    <header>FrameLabel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QLedIndicator</class>
+   <extends>QWidget</extends>
+   <header>qledindicator.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

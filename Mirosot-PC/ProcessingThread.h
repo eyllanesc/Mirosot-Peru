@@ -63,6 +63,11 @@ private:
     bool rgbOn;
     bool hsvOn;
     bool ycrcbOn;
+
+    bool teamOn;
+    bool robot1On;
+    bool robot2On;
+    bool ballOn;
     // Processing settings
     //Team
     int TeamColorType;

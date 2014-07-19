@@ -9,17 +9,20 @@
 
 
 ProcessingSettingsDialog::ProcessingSettingsDialog(QWidget *parent) :
-  QDialog(parent),
+    QDialog(parent),
     ui(new Ui::ProcessingSettingsDialog)
 {
     // Setup dialog
     ui->setupUi(this);
     // Connect GUI signals and slots
-    connect(ui->resetAllToDefaultsButton,SIGNAL(released()),SLOT(resetAllDialogToDefaults()));
-    connect(ui->resetColorToDefaultsButton,SIGNAL(released()),SLOT(resetColorDialogToDefaults()));
-    connect(ui->applyButton,SIGNAL(released()),SLOT(updateStoredSettingsFromDialog()));
-    connect(ui->ColorTypeGroup,SIGNAL(buttonReleased(QAbstractButton*)),SLOT(ColorTypeChange(QAbstractButton*)));
-    // dilateIterationsEdit input string validation
+    connect(ui->resetAllToDefaultsButton,SIGNAL(clicked()),this,SLOT(resetAllDialogToDefaults()));
+    connect(ui->applyButton,SIGNAL(clicked()),this,SLOT(updateStoredSettingsFromDialog()));
+    connect(ui->resetBSToDefaultsButton,SIGNAL(clicked()),this,SLOT(resetBSDialogToDefaults()));
+    connect(ui->resetTeamToDefaultsButton ,SIGNAL(clicked()),this,SLOT(resetTeamDialogToDefaults()));
+    connect(ui->resetRobot1ToDefaultsButton ,SIGNAL(clicked()),this,SLOT(resetRobot1DialogToDefaults()));
+    connect(ui->resetRobot2ToDefaultsButton ,SIGNAL(clicked()),this,SLOT(resetRobot2DialogToDefaults()));
+    connect(ui->resetBallToDefaultsButton ,SIGNAL(clicked()),this,SLOT(resetBallDialogToDefaults()));
+    //Background Substraction
     QRegExp rx("[1-9]\\d{0,2}"); // Integers 1 to 99
     QRegExpValidator *validator = new QRegExpValidator(rx, 0);
     ui->BSIterationsEdit->setValidator(validator);
@@ -29,48 +32,245 @@ ProcessingSettingsDialog::ProcessingSettingsDialog(QWidget *parent) :
     updateStoredSettingsFromDialog();
 } // ProcessingSettingsDialog constructor
 
+void ProcessingSettingsDialog::updateDialogSettingsFromStored()
+{
+    //Team
+    if(processingSettings.TeamColorType==0)
+        ui->TeamColorRGBButton->setChecked(true);
+    else if(processingSettings.TeamColorType==1)
+        ui->TeamColorHSVButton->setChecked(true);
+    else if(processingSettings.TeamColorType==2)
+        ui->TeamColorYCrCbButton->setChecked(true);
+    ui->TeamChannel1qxtSpanSlider->setLowerValue(processingSettings.TeamChannel1min);
+    ui->TeamChannel1qxtSpanSlider->setUpperValue(processingSettings.TeamChannel1max);
+    ui->TeamChannel2qxtSpanSlider->setLowerValue(processingSettings.TeamChannel2min);
+    ui->TeamChannel2qxtSpanSlider->setUpperValue(processingSettings.TeamChannel2max);
+    ui->TeamChannel3qxtSpanSlider->setLowerValue(processingSettings.TeamChannel3min);
+    ui->TeamChannel3qxtSpanSlider->setUpperValue(processingSettings.TeamChannel3max);
+
+    //Robot1
+    if(processingSettings.Robot1ColorType==0)
+        ui->Robot1ColorRGBButton->setChecked(true);
+    else if(processingSettings.Robot1ColorType==1)
+        ui->Robot1ColorHSVButton->setChecked(true);
+    else if(processingSettings.Robot1ColorType==2)
+        ui->Robot1ColorYCrCbButton->setChecked(true);
+    ui->Robot1Channel1qxtSpanSlider->setLowerValue(processingSettings.Robot1Channel1min);
+    ui->Robot1Channel1qxtSpanSlider->setUpperValue(processingSettings.Robot1Channel1max);
+    ui->Robot1Channel2qxtSpanSlider->setLowerValue(processingSettings.Robot1Channel2min);
+    ui->Robot1Channel2qxtSpanSlider->setUpperValue(processingSettings.Robot1Channel2max);
+    ui->Robot1Channel3qxtSpanSlider->setLowerValue(processingSettings.Robot1Channel3min);
+    ui->Robot1Channel3qxtSpanSlider->setUpperValue(processingSettings.Robot1Channel3max);
+
+    //Robot2
+    if(processingSettings.Robot2ColorType==0)
+        ui->Robot2ColorRGBButton->setChecked(true);
+    else if(processingSettings.Robot2ColorType==1)
+        ui->Robot2ColorHSVButton->setChecked(true);
+    else if(processingSettings.Robot2ColorType==2)
+        ui->Robot2ColorYCrCbButton->setChecked(true);
+    ui->Robot2Channel1qxtSpanSlider->setLowerValue(processingSettings.Robot2Channel1min);
+    ui->Robot2Channel1qxtSpanSlider->setUpperValue(processingSettings.Robot2Channel1max);
+    ui->Robot2Channel2qxtSpanSlider->setLowerValue(processingSettings.Robot2Channel2min);
+    ui->Robot2Channel2qxtSpanSlider->setUpperValue(processingSettings.Robot2Channel2max);
+    ui->Robot2Channel3qxtSpanSlider->setLowerValue(processingSettings.Robot2Channel3min);
+    ui->Robot2Channel3qxtSpanSlider->setUpperValue(processingSettings.Robot2Channel3max);
+
+    //Ball
+    if(processingSettings.BallColorType==0)
+        ui->BallColorRGBButton->setChecked(true);
+    else if(processingSettings.BallColorType==1)
+        ui->BallColorHSVButton->setChecked(true);
+    else if(processingSettings.BallColorType==2)
+        ui->BallColorYCrCbButton->setChecked(true);
+    ui->BallChannel1qxtSpanSlider->setLowerValue(processingSettings.BallChannel1min);
+    ui->BallChannel1qxtSpanSlider->setUpperValue(processingSettings.BallChannel1max);
+    ui->BallChannel2qxtSpanSlider->setLowerValue(processingSettings.BallChannel2min);
+    ui->BallChannel2qxtSpanSlider->setUpperValue(processingSettings.BallChannel2max);
+    ui->BallChannel3qxtSpanSlider->setLowerValue(processingSettings.BallChannel3min);
+    ui->BallChannel3qxtSpanSlider->setUpperValue(processingSettings.BallChannel3max);
+
+} // updateDialogSettingsFromStored()
+
+
+void ProcessingSettingsDialog::resetTeamDialogToDefaults()
+{
+    if(DEFAULT_COLOR_TYPE==0)
+        ui->TeamColorRGBButton->setChecked(true);
+    else if(DEFAULT_COLOR_TYPE==1)
+        ui->TeamColorHSVButton->setChecked(true);
+    else if(DEFAULT_COLOR_TYPE==2)
+        ui->TeamColorYCrCbButton->setChecked(true);
+
+    ui->TeamChannel1qxtSpanSlider->setLowerPosition(0);
+    ui->TeamChannel1qxtSpanSlider->setUpperPosition(255);
+    ui->TeamChannel2qxtSpanSlider->setLowerPosition(0);
+    ui->TeamChannel2qxtSpanSlider->setUpperPosition(255);
+    ui->TeamChannel3qxtSpanSlider->setLowerPosition(0);
+    ui->TeamChannel3qxtSpanSlider->setUpperPosition(255);
+
+    ui->TeamChannel1min->setText(QString::number(ui->TeamChannel1qxtSpanSlider->lowerValue()));
+    ui->TeamChannel1max->setText(QString::number(ui->TeamChannel1qxtSpanSlider->upperValue()));
+    ui->TeamChannel2min->setText(QString::number(ui->TeamChannel2qxtSpanSlider->lowerValue()));
+    ui->TeamChannel2max->setText(QString::number(ui->TeamChannel2qxtSpanSlider->upperValue()));
+    ui->TeamChannel3min->setText(QString::number(ui->TeamChannel3qxtSpanSlider->lowerValue()));
+    ui->TeamChannel3max->setText(QString::number(ui->TeamChannel3qxtSpanSlider->upperValue()));
+}
+
+void ProcessingSettingsDialog::resetRobot1DialogToDefaults()
+{
+    if(DEFAULT_COLOR_TYPE==0)
+        ui->Robot1ColorRGBButton->setChecked(true);
+    else if(DEFAULT_COLOR_TYPE==1)
+        ui->Robot1ColorHSVButton->setChecked(true);
+    else if(DEFAULT_COLOR_TYPE==2)
+        ui->Robot1ColorYCrCbButton->setChecked(true);
+
+    ui->Robot1Channel1qxtSpanSlider->setLowerPosition(0);
+    ui->Robot1Channel1qxtSpanSlider->setUpperPosition(255);
+    ui->Robot1Channel2qxtSpanSlider->setLowerPosition(0);
+    ui->Robot1Channel2qxtSpanSlider->setUpperPosition(255);
+    ui->Robot1Channel3qxtSpanSlider->setLowerPosition(0);
+    ui->Robot1Channel3qxtSpanSlider->setUpperPosition(255);
+
+    ui->Robot1Channel1min->setText(QString::number(ui->Robot1Channel1qxtSpanSlider->lowerValue()));
+    ui->Robot1Channel1max->setText(QString::number(ui->Robot1Channel1qxtSpanSlider->upperValue()));
+    ui->Robot1Channel2min->setText(QString::number(ui->Robot1Channel2qxtSpanSlider->lowerValue()));
+    ui->Robot1Channel2max->setText(QString::number(ui->Robot1Channel2qxtSpanSlider->upperValue()));
+    ui->Robot1Channel3min->setText(QString::number(ui->Robot1Channel3qxtSpanSlider->lowerValue()));
+    ui->Robot1Channel3max->setText(QString::number(ui->Robot1Channel3qxtSpanSlider->upperValue()));
+}
+
+void ProcessingSettingsDialog::resetRobot2DialogToDefaults()
+{
+    if(DEFAULT_COLOR_TYPE==0)
+        ui->Robot2ColorRGBButton->setChecked(true);
+    else if(DEFAULT_COLOR_TYPE==1)
+        ui->Robot2ColorHSVButton->setChecked(true);
+    else if(DEFAULT_COLOR_TYPE==2)
+        ui->Robot2ColorYCrCbButton->setChecked(true);
+
+    ui->Robot2Channel1qxtSpanSlider->setLowerPosition(0);
+    ui->Robot2Channel1qxtSpanSlider->setUpperPosition(255);
+    ui->Robot2Channel2qxtSpanSlider->setLowerPosition(0);
+    ui->Robot2Channel2qxtSpanSlider->setUpperPosition(255);
+    ui->Robot2Channel3qxtSpanSlider->setLowerPosition(0);
+    ui->Robot2Channel3qxtSpanSlider->setUpperPosition(255);
+
+    ui->Robot2Channel1min->setText(QString::number(ui->Robot2Channel1qxtSpanSlider->lowerValue()));
+    ui->Robot2Channel1max->setText(QString::number(ui->Robot2Channel1qxtSpanSlider->upperValue()));
+    ui->Robot2Channel2min->setText(QString::number(ui->Robot2Channel2qxtSpanSlider->lowerValue()));
+    ui->Robot2Channel2max->setText(QString::number(ui->Robot2Channel2qxtSpanSlider->upperValue()));
+    ui->Robot2Channel3min->setText(QString::number(ui->Robot2Channel3qxtSpanSlider->lowerValue()));
+    ui->Robot2Channel3max->setText(QString::number(ui->Robot2Channel3qxtSpanSlider->upperValue()));
+}
+
+void ProcessingSettingsDialog::resetBallDialogToDefaults()
+{
+    if(DEFAULT_COLOR_TYPE==0)
+        ui->BallColorRGBButton->setChecked(true);
+    else if(DEFAULT_COLOR_TYPE==1)
+        ui->BallColorHSVButton->setChecked(true);
+    else if(DEFAULT_COLOR_TYPE==2)
+        ui->BallColorYCrCbButton->setChecked(true);
+
+    ui->BallChannel1qxtSpanSlider->setLowerPosition(0);
+    ui->BallChannel1qxtSpanSlider->setUpperPosition(255);
+    ui->BallChannel2qxtSpanSlider->setLowerPosition(0);
+    ui->BallChannel2qxtSpanSlider->setUpperPosition(255);
+    ui->BallChannel3qxtSpanSlider->setLowerPosition(0);
+    ui->BallChannel3qxtSpanSlider->setUpperPosition(255);
+
+    ui->BallChannel1min->setText(QString::number(ui->BallChannel1qxtSpanSlider->lowerValue()));
+    ui->BallChannel1max->setText(QString::number(ui->BallChannel1qxtSpanSlider->upperValue()));
+    ui->BallChannel2min->setText(QString::number(ui->BallChannel2qxtSpanSlider->lowerValue()));
+    ui->BallChannel2max->setText(QString::number(ui->BallChannel2qxtSpanSlider->upperValue()));
+    ui->BallChannel3min->setText(QString::number(ui->BallChannel3qxtSpanSlider->lowerValue()));
+    ui->BallChannel3max->setText(QString::number(ui->BallChannel3qxtSpanSlider->upperValue()));
+}
+
+void ProcessingSettingsDialog::resetColorDialogToDefaults()
+{
+    resetTeamDialogToDefaults();
+    resetRobot1DialogToDefaults();
+    resetRobot2DialogToDefaults();
+    resetBallDialogToDefaults();
+}
+
 void ProcessingSettingsDialog::updateStoredSettingsFromDialog()
 {
-    // Validate values in dialog before storing
-    validateDialog();
-    // Color
-    if(ui->ColorTypeGroup->checkedButton()==(QAbstractButton*)ui->ColorRGBButton )processingSettings.ColorType=0;
-    else if(ui->ColorTypeGroup->checkedButton()==(QAbstractButton*)ui->ColorHSVButton)
-        processingSettings.ColorType=1;
-    else if(ui->ColorTypeGroup->checkedButton()==(QAbstractButton*)ui->ColorYCrCbButton)
-        processingSettings.ColorType=2;
-    processingSettings.ColorParam1=ui->ColorParam1Edit->text().toInt();
-    processingSettings.ColorParam2=ui->ColorParam2Edit->text().toInt();
-    processingSettings.ColorParam3=ui->ColorParam3Edit->text().toInt();
-    processingSettings.ColorParam1_2=ui->ColorParam1Edit_2->text().toInt();
-    processingSettings.ColorParam2_2=ui->ColorParam2Edit_2->text().toInt();
-    processingSettings.ColorParam3_2=ui->ColorParam3Edit_2->text().toInt();
-    // BS
+
+    //COLOR:
+
+    //Team
+    if(ui->TeamColorRGBButton->isChecked())
+        processingSettings.TeamColorType=0;
+    else if(ui->TeamColorHSVButton->isChecked())
+        processingSettings.TeamColorType=1;
+    else if(ui->TeamColorYCrCbButton->isChecked())
+        processingSettings.TeamColorType=2;
+
+    processingSettings.TeamChannel1min = ui->TeamChannel1qxtSpanSlider->lowerPosition();
+    processingSettings.TeamChannel1max = ui->TeamChannel1qxtSpanSlider->upperPosition();
+    processingSettings.TeamChannel2min = ui->TeamChannel2qxtSpanSlider->lowerPosition();
+    processingSettings.TeamChannel2max = ui->TeamChannel2qxtSpanSlider->upperPosition();
+    processingSettings.TeamChannel3min = ui->TeamChannel3qxtSpanSlider->lowerPosition();
+    processingSettings.TeamChannel3max = ui->TeamChannel3qxtSpanSlider->upperPosition();
+
+    //Robot1
+    if(ui->Robot1ColorRGBButton->isChecked())
+        processingSettings.Robot1ColorType=0;
+    else if(ui->Robot1ColorHSVButton->isChecked())
+        processingSettings.Robot1ColorType=1;
+    else if(ui->Robot1ColorYCrCbButton)
+        processingSettings.Robot1ColorType=2;
+
+    processingSettings.Robot1Channel1min = ui->Robot1Channel1qxtSpanSlider->lowerPosition();
+    processingSettings.Robot1Channel1max = ui->Robot1Channel1qxtSpanSlider->upperPosition();
+    processingSettings.Robot1Channel2min = ui->Robot1Channel2qxtSpanSlider->lowerPosition();
+    processingSettings.Robot1Channel2max = ui->Robot1Channel2qxtSpanSlider->upperPosition();
+    processingSettings.Robot1Channel3min = ui->Robot1Channel3qxtSpanSlider->lowerPosition();
+    processingSettings.Robot1Channel3max = ui->Robot1Channel3qxtSpanSlider->upperPosition();
+
+    //Robot2
+    if(ui->Robot2ColorRGBButton->isChecked())
+        processingSettings.Robot2ColorType=0;
+    else if(ui->Robot2ColorHSVButton->isChecked())
+        processingSettings.Robot2ColorType=1;
+    else if(ui->Robot2ColorYCrCbButton)
+        processingSettings.Robot2ColorType=2;
+
+    processingSettings.Robot2Channel1min = ui->Robot2Channel1qxtSpanSlider->lowerPosition();
+    processingSettings.Robot2Channel1max = ui->Robot2Channel1qxtSpanSlider->upperPosition();
+    processingSettings.Robot2Channel2min = ui->Robot2Channel2qxtSpanSlider->lowerPosition();
+    processingSettings.Robot2Channel2max = ui->Robot2Channel2qxtSpanSlider->upperPosition();
+    processingSettings.Robot2Channel3min = ui->Robot2Channel3qxtSpanSlider->lowerPosition();
+    processingSettings.Robot2Channel3max = ui->Robot2Channel3qxtSpanSlider->upperPosition();
+
+    //Ball
+    if(ui->BallColorRGBButton->isChecked())
+        processingSettings.BallColorType=0;
+    else if(ui->BallColorHSVButton->isChecked())
+        processingSettings.BallColorType=1;
+    else if(ui->BallColorYCrCbButton)
+        processingSettings.BallColorType=2;
+
+    processingSettings.BallChannel1min = ui->BallChannel1qxtSpanSlider->lowerPosition();
+    processingSettings.BallChannel1max = ui->BallChannel1qxtSpanSlider->upperPosition();
+    processingSettings.BallChannel2min = ui->BallChannel2qxtSpanSlider->lowerPosition();
+    processingSettings.BallChannel2max = ui->BallChannel2qxtSpanSlider->upperPosition();
+    processingSettings.BallChannel3min = ui->BallChannel3qxtSpanSlider->lowerPosition();
+    processingSettings.BallChannel3max = ui->BallChannel3qxtSpanSlider->upperPosition();
+
     processingSettings.BSNumberOfIterations=ui->BSIterationsEdit->text().toInt();
     // Update processing flags in processingThread
     emit newProcessingSettings(processingSettings);
 } // updateStoredSettingsFromDialog()
 
-void ProcessingSettingsDialog::updateDialogSettingsFromStored()
+void ProcessingSettingsDialog::resetBSDialogToDefaults()
 {
-    // Color
-    if(processingSettings.ColorType==0)
-        ui->ColorRGBButton->setChecked(true);
-    else if(processingSettings.ColorType==1)
-        ui->ColorHSVButton->setChecked(true);
-    else if(processingSettings.ColorType==2)
-        ui->ColorYCrCbButton->setChecked(true);
-    ui->ColorParam1Edit->setText(QString::number(processingSettings.ColorParam1));
-    ui->ColorParam2Edit->setText(QString::number(processingSettings.ColorParam2));
-    ui->ColorParam3Edit->setText(QString::number(processingSettings.ColorParam3));
-    ui->ColorParam1Edit_2->setText(QString::number(processingSettings.ColorParam1_2));
-    ui->ColorParam2Edit_2->setText(QString::number(processingSettings.ColorParam2_2));
-    ui->ColorParam3Edit_2->setText(QString::number(processingSettings.ColorParam3_2));
-    // BS
-    ui->BSIterationsEdit->setText(QString::number(processingSettings.BSNumberOfIterations));
-    // Enable/disable appropriate Smooth parameter inputs
-    ColorTypeChange(ui->ColorTypeGroup->checkedButton());
-} // updateDialogSettingsFromStored()
+    ui->BSIterationsEdit->setText(QString::number(DEFAULT_BS_ITERATIONS));
+} //resetBSDialogToDefaults()
 
 void ProcessingSettingsDialog::resetAllDialogToDefaults()
 {
@@ -79,234 +279,126 @@ void ProcessingSettingsDialog::resetAllDialogToDefaults()
     resetBSDialogToDefaults();
 } // resetAllDialogToDefaults()
 
-void ProcessingSettingsDialog::ColorTypeChange(QAbstractButton *input)
+//Team
+void ProcessingSettingsDialog::on_TeamChannel1qxtSpanSlider_lowerValueChanged(int lower)
 {
-    if(input==(QAbstractButton*)ui->ColorRGBButton)
-    {
-        // ColorParam1Edit input string validation
-        QRegExp rx1("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator1 = new QRegExpValidator(rx1, 0);
-        ui->ColorParam1Edit->setValidator(validator1);
-        // ColorParam2Edit input string validation
-        QRegExp rx2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator2 = new QRegExpValidator(rx2, 0);
-        ui->ColorParam2Edit->setValidator(validator2);
-        // ColorParam1Edit input string validation
-        QRegExp rx3("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator3 = new QRegExpValidator(rx3, 0);
-        ui->ColorParam3Edit->setValidator(validator3);
-        // ColorParam2Edit input string validation
-        QRegExp rx1_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator1_2 = new QRegExpValidator(rx1_2, 0);
-        ui->ColorParam1Edit_2->setValidator(validator1_2);
-        QRegExp rx2_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator2_2 = new QRegExpValidator(rx2_2, 0);
-        ui->ColorParam2Edit_2->setValidator(validator2_2);
-        QRegExp rx3_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator3_2 = new QRegExpValidator(rx3_2, 0);
-        ui->ColorParam3Edit_2->setValidator(validator3_2);
-        // Enable/disable appropriate parameter inputs
-        ui->ColorParam1Edit->setEnabled(true);
-        ui->ColorParam2Edit->setEnabled(true);
-        ui->ColorParam3Edit->setEnabled(true);
-        ui->ColorParam1Edit_2->setEnabled(true);
-        ui->ColorParam2Edit_2->setEnabled(true);
-        ui->ColorParam3Edit_2->setEnabled(true);
-        // Set parameter range labels
-        //smoothParam1RangeLabel->setText("[1-99]");
-        //smoothParam2RangeLabel->setText("[1-99]");
-        //smoothParam3RangeLabel->setText("");
-        //smoothParam4RangeLabel->setText("");
-        // Set parameter labels
-        ui->ColorParam1Label->setText("R min:");
-        ui->ColorParam2Label->setText("G min:");
-        ui->ColorParam3Label->setText("B min:");
-        ui->ColorParam1Label_2->setText("R max:");
-        ui->ColorParam2Label_2->setText("G max:");
-        ui->ColorParam3Label_2->setText("B max:");
-    }
-    else if(input==(QAbstractButton*)ui->ColorHSVButton)
-    {
-        // ColorParam1Edit input string validation
-        QRegExp rx1("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator1 = new QRegExpValidator(rx1, 0);
-        ui->ColorParam1Edit->setValidator(validator1);
-        // ColorParam2Edit input string validation
-        QRegExp rx2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator2 = new QRegExpValidator(rx2, 0);
-        ui->ColorParam2Edit->setValidator(validator2);
-        // ColorParam1Edit input string validation
-        QRegExp rx3("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator3 = new QRegExpValidator(rx3, 0);
-        ui->ColorParam3Edit->setValidator(validator3);
-        // ColorParam2Edit input string validation
-        QRegExp rx1_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator1_2 = new QRegExpValidator(rx1_2, 0);
-        ui->ColorParam1Edit_2->setValidator(validator1_2);
-        QRegExp rx2_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator2_2 = new QRegExpValidator(rx2_2, 0);
-        ui->ColorParam2Edit_2->setValidator(validator2_2);
-        QRegExp rx3_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator3_2 = new QRegExpValidator(rx3_2, 0);
-        ui->ColorParam3Edit_2->setValidator(validator3_2);
-        // Enable/disable appropriate parameter inputs
-        ui->ColorParam1Edit->setEnabled(true);
-        ui->ColorParam2Edit->setEnabled(true);
-        ui->ColorParam3Edit->setEnabled(true);
-        ui->ColorParam1Edit_2->setEnabled(true);
-        ui->ColorParam2Edit_2->setEnabled(true);
-        ui->ColorParam3Edit_2->setEnabled(true);
-        // Set parameter range labels
-        //smoothParam1RangeLabel->setText("[1-99]");
-        //smoothParam2RangeLabel->setText("[1-99]");
-        //smoothParam3RangeLabel->setText("");
-        //smoothParam4RangeLabel->setText("");
-        // Set parameter labels
-        ui->ColorParam1Label->setText("H min:");
-        ui->ColorParam2Label->setText("S min:");
-        ui->ColorParam3Label->setText("V min:");
-        ui->ColorParam1Label_2->setText("H max:");
-        ui->ColorParam2Label_2->setText("S max:");
-        ui->ColorParam3Label_2->setText("V max:");
-    }
-    else if(input==(QAbstractButton*)ui->ColorYCrCbButton)
-    {
-        // ColorParam1Edit input string validation
-        QRegExp rx1("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator1 = new QRegExpValidator(rx1, 0);
-        ui->ColorParam1Edit->setValidator(validator1);
-        // ColorParam2Edit input string validation
-        QRegExp rx2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator2 = new QRegExpValidator(rx2, 0);
-        ui->ColorParam2Edit->setValidator(validator2);
-        // ColorParam1Edit input string validation
-        QRegExp rx3("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator3 = new QRegExpValidator(rx3, 0);
-        ui->ColorParam3Edit->setValidator(validator3);
-        // ColorParam2Edit input string validation
-        QRegExp rx1_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator1_2 = new QRegExpValidator(rx1_2, 0);
-        ui->ColorParam1Edit_2->setValidator(validator1_2);
-        QRegExp rx2_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator2_2 = new QRegExpValidator(rx2_2, 0);
-        ui->ColorParam2Edit_2->setValidator(validator2_2);
-        QRegExp rx3_2("[1-9]\\d{0,2}"); // Integers 1 to 99
-        QRegExpValidator *validator3_2 = new QRegExpValidator(rx3_2, 0);
-        ui->ColorParam3Edit_2->setValidator(validator3_2);
-        // Enable/disable appropriate parameter inputs
-        ui->ColorParam1Edit->setEnabled(true);
-        ui->ColorParam2Edit->setEnabled(true);
-        ui->ColorParam3Edit->setEnabled(true);
-        ui->ColorParam1Edit_2->setEnabled(true);
-        ui->ColorParam2Edit_2->setEnabled(true);
-        ui->ColorParam3Edit_2->setEnabled(true);
-        // Set parameter labels
-        ui->ColorParam1Label->setText("Y min:");
-        ui->ColorParam2Label->setText("Cr min:");
-        ui->ColorParam3Label->setText("Cb min:");
-        ui->ColorParam1Label_2->setText("Y max:");
-        ui->ColorParam2Label_2->setText("Cr max:");
-        ui->ColorParam3Label_2->setText("Cb max:");
-    }
-} // ColorTypeChange()
+    ui->TeamChannel1min->setText(QString::number(lower));
+}
 
-void ProcessingSettingsDialog::validateDialog()
+void ProcessingSettingsDialog::on_TeamChannel1qxtSpanSlider_upperValueChanged(int upper)
 {
-    // Local variables
-    bool inputEmpty=false;
+    ui->TeamChannel1max->setText(QString::number(upper));
+}
 
-    /*// If value of Smooth parameter 1 is EVEN (and not zero), convert to ODD by adding 1
-    if(((smoothParam1Edit->text().toInt()%2)==0)&&(smoothParam1Edit->text().toInt()!=0))
-    {
-        smoothParam1Edit->setText(QString::number(smoothParam1Edit->text().toInt()+1));
-        QMessageBox::information(this->parentWidget(),"NOTE:","Smooth parameter 1 must be an ODD number.\n\nAutomatically set to (inputted value+1).");
-    }
-    // If value of Smooth parameter 2 is EVEN (and not zero), convert to ODD by adding 1
-    if(((smoothParam2Edit->text().toInt()%2)==0)&&(smoothParam2Edit->text().toInt()!=0))
-    {
-        smoothParam2Edit->setText(QString::number(smoothParam2Edit->text().toInt()+1));
-        QMessageBox::information(this->parentWidget(),"NOTE:","Smooth parameter 2 must be an ODD number (or zero).\n\nAutomatically set to (inputted value+1).");
-    }
-*/
-    // Check for empty inputs: if empty, set to default values
-    if(ui->ColorParam1Edit->text().isEmpty())
-    {
-        ui->ColorParam1Edit->setText(QString::number(DEFAULT_COLOR_PARAM_1));
-    }
-    if(ui->ColorParam2Edit->text().isEmpty())
-    {
-        ui->ColorParam2Edit->setText(QString::number(DEFAULT_COLOR_PARAM_2));
-    }
-    if(ui->ColorParam3Edit->text().isEmpty())
-    {
-        ui->ColorParam1Edit->setText(QString::number(DEFAULT_COLOR_PARAM_3));
-    }
-    if(ui->ColorParam1Edit_2->text().isEmpty())
-    {
-        ui->ColorParam1Edit_2->setText(QString::number(DEFAULT_COLOR_PARAM_1_2));
-    }
-    if(ui->ColorParam2Edit_2->text().isEmpty())
-    {
-        ui->ColorParam2Edit_2->setText(QString::number(DEFAULT_COLOR_PARAM_2_2));
-    }
-    if(ui->ColorParam3Edit_2->text().isEmpty())
-    {
-        ui->ColorParam1Edit_2->setText(QString::number(DEFAULT_COLOR_PARAM_3_2));
-    }
-    if(ui->BSIterationsEdit->text().isEmpty())
-    {
-        ui->BSIterationsEdit->setText(QString::number(DEFAULT_BS_ITERATIONS));
-        inputEmpty=true;
-    }
-    // Check if any of the inputs were empty
-    if(inputEmpty)
-        QMessageBox::warning(this->parentWidget(),"WARNING:","One or more inputs empty.\n\nAutomatically set to default values.");
-
-    // Check for special parameter cases when smoothing type is GAUSSIAN
-    /*if((smoothTypeGroup->checkedButton()==(QAbstractButton*)smoothGaussianButton)&&
-       (smoothParam1Edit->text().toInt()==0)&&(smoothParam3Edit->text().toDouble()==0.00))
-    {
-        smoothParam1Edit->setText(QString::number(DEFAULT_SMOOTH_PARAM_1));
-        smoothParam3Edit->setText(QString::number(DEFAULT_SMOOTH_PARAM_3));
-        QMessageBox::warning(this->parentWidget(),"ERROR:","Parameters 1 and 3 cannot BOTH be zero when the smoothing type is GAUSSIAN.\n\nAutomatically set to default values.");
-    }
-    if((smoothTypeGroup->checkedButton()==(QAbstractButton*)smoothGaussianButton)&&
-       (smoothParam2Edit->text().toInt()==0)&&(smoothParam4Edit->text().toDouble()==0.00))
-    {
-        smoothParam2Edit->setText(QString::number(DEFAULT_SMOOTH_PARAM_2));
-        smoothParam4Edit->setText(QString::number(DEFAULT_SMOOTH_PARAM_4));
-        QMessageBox::warning(this->parentWidget(),"ERROR:","Parameters 2 and 4 cannot BOTH be zero when the smoothing type is GAUSSIAN.\n\nAutomatically set to default values.");
-    }
-    */
-    // Ensure neither smoothing parameters 1 or 2 are ZERO (except in the GAUSSIAN case)
-    /*if((smoothTypeGroup->checkedButton()!=(QAbstractButton*)smoothGaussianButton)&&
-       ((smoothParam1Edit->text().toInt()==0)||(smoothParam2Edit->text().toDouble()==0)))
-    {
-        smoothParam1Edit->setText(QString::number(DEFAULT_SMOOTH_PARAM_1));
-        smoothParam2Edit->setText(QString::number(DEFAULT_SMOOTH_PARAM_2));
-        QMessageBox::warning(this->parentWidget(),"ERROR:","Parameters 1 or 2 cannot be zero for the current smoothing type.\n\nAutomatically set to default values.");
-    }*/
-} // validateDialog()
-
-void ProcessingSettingsDialog::resetColorDialogToDefaults()
+void ProcessingSettingsDialog::on_TeamChannel2qxtSpanSlider_lowerValueChanged(int lower)
 {
-    if(DEFAULT_COLOR_TYPE==0)
-        ui->ColorRGBButton->setChecked(true);
-    else if(DEFAULT_COLOR_TYPE==1)
-        ui->ColorHSVButton->setChecked(true);
-    else if(DEFAULT_COLOR_TYPE==2)
-        ui->ColorYCrCbButton->setChecked(true);
-    ui->ColorParam1Edit->setText(QString::number(DEFAULT_COLOR_PARAM_1));
-    ui->ColorParam2Edit->setText(QString::number(DEFAULT_COLOR_PARAM_2));
-    ui->ColorParam3Edit->setText(QString::number(DEFAULT_COLOR_PARAM_3));
-    ui->ColorParam1Edit_2->setText(QString::number(DEFAULT_COLOR_PARAM_1_2));
-    ui->ColorParam2Edit_2->setText(QString::number(DEFAULT_COLOR_PARAM_2_2));
-    ui->ColorParam3Edit_2->setText(QString::number(DEFAULT_COLOR_PARAM_3_2));
-    // Enable/disable appropriate Smooth parameter inputs
-    ColorTypeChange(ui->ColorTypeGroup->checkedButton());
-} // resetSmoothDialogToDefaults()
+    ui->TeamChannel2min->setText(QString::number(lower));
+}
 
-void ProcessingSettingsDialog::resetBSDialogToDefaults()
+void ProcessingSettingsDialog::on_TeamChannel2qxtSpanSlider_upperValueChanged(int upper)
 {
-    ui->BSIterationsEdit->setText(QString::number(DEFAULT_BS_ITERATIONS));
-} // resetDilateDialogToDefaults()
+    ui->TeamChannel2max->setText(QString::number(upper));
+}
+
+void ProcessingSettingsDialog::on_TeamChannel3qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->TeamChannel3min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_TeamChannel3qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->TeamChannel3max->setText(QString::number(upper));
+}
+
+//Robot2
+void ProcessingSettingsDialog::on_Robot2Channel1qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->Robot2Channel1min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_Robot2Channel1qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->Robot2Channel1max->setText(QString::number(upper));
+}
+
+void ProcessingSettingsDialog::on_Robot2Channel2qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->Robot2Channel2min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_Robot2Channel2qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->Robot2Channel2max->setText(QString::number(upper));
+}
+
+void ProcessingSettingsDialog::on_Robot2Channel3qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->Robot2Channel3min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_Robot2Channel3qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->Robot2Channel3max->setText(QString::number(upper));
+}
+
+//Robot1
+void ProcessingSettingsDialog::on_Robot1Channel1qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->Robot1Channel1min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_Robot1Channel1qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->Robot1Channel1max->setText(QString::number(upper));
+}
+
+void ProcessingSettingsDialog::on_Robot1Channel2qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->Robot1Channel2min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_Robot1Channel2qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->Robot1Channel2max->setText(QString::number(upper));
+}
+
+void ProcessingSettingsDialog::on_Robot1Channel3qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->Robot1Channel3min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_Robot1Channel3qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->Robot1Channel3max->setText(QString::number(upper));
+}
+
+//Ball
+void ProcessingSettingsDialog::on_BallChannel1qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->BallChannel1min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_BallChannel1qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->BallChannel1max->setText(QString::number(upper));
+}
+
+void ProcessingSettingsDialog::on_BallChannel2qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->BallChannel2min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_BallChannel2qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->BallChannel2max->setText(QString::number(upper));
+}
+
+void ProcessingSettingsDialog::on_BallChannel3qxtSpanSlider_lowerValueChanged(int lower)
+{
+    ui->BallChannel3min->setText(QString::number(lower));
+}
+
+void ProcessingSettingsDialog::on_BallChannel3qxtSpanSlider_upperValueChanged(int upper)
+{
+    ui->BallChannel3max->setText(QString::number(upper));
+}

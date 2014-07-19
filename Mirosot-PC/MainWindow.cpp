@@ -13,6 +13,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     // Setup user interface
     ui->setupUi(this);
+    isPlay=false;
+    //ui->on_off->setText("Play");
+    playCtl = new QPushButton(this);
+    playCtl->setIcon(QIcon(QPixmap("/home/edwin/Documents/MS/images/connect.png")));
+    playCtl->setIconSize(QSize(25, 25));
+    connect(playCtl,SIGNAL(clicked()),this,SLOT(play()));
+    playCtl->setStyleSheet("QPushButton{border: none;outline: none;}");
+    playCtl->move(1000,600);
+    playCtl->setDisabled(true);
+    //leds.append(new QLedIndicator(this));
     //QPalette Pal(palette());
     // Asignar el color de fondo como Negro
     //Pal.setColor(QPalette::Background, QColor::fromRgb(129, 0, 49 ));
@@ -26,17 +36,31 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     appVersion=QUOTE(APP_VERSION);
     // Create processingSettingsDialog
     processingSettingsDialog = new ProcessingSettingsDialog();
-    // Initialize data structures
+
     initializeProcessingFlagsStructure();
+
     initializeTaskDataStructure();
-    // Enable/disable appropriate GUI items
+
     setInitGUIState();
-    // Initialize GUI
+
     initializeGUI();
-    // Connect signals to slots
+
     signalSlotsInit();
-    // Initialize flag
+
+    rgbOn=false;
+    hsvOn=false;
+    ycrcbOn=false;
+
+    teamOn=false;
+    robot1On=false;
+    robot2On=false;
+    ballOn=false;
+
     isCameraConnected=false;
+    isPortConnected=false;
+
+
+
     settingsDialog = new SettingsDialog(this);
     cameraConnectDialog = new CameraConnectDialog(this);
 } // MainWindow constructor
@@ -111,10 +135,14 @@ void MainWindow::connectToCamera()
 
 void MainWindow::readData()
 {
-       ui->datalabel_2->setText(controller->sendThread->serial->readAll());
+    //ui->datalabel_2->setText(controller->sendThread->serial->readAll());
 
 }
 
+void MainWindow::connectToPlay()
+{
+
+}
 void MainWindow::connectToStart()
 {
     if(QString::compare(ui->StartAction->text(),"Connect",Qt::CaseSensitive)==0)
@@ -125,6 +153,8 @@ void MainWindow::connectToStart()
             isCameraConnected=controller->connectToCamera(deviceNumber,imageBufferSize);
         if(isPortConnected && isCameraConnected)
         {
+            playCtl->setDisabled(false);
+            connect(playCtl,SIGNAL(clicked()),this,SLOT(play()));
             connect(controller->sendThread->serial, SIGNAL(readyRead()), this,SLOT(readData()),Qt::UniqueConnection);
             connect(controller->processingThread,SIGNAL(newData(QString)),this,SLOT(updateData(QString)),Qt::UniqueConnection);
             connect(controller->processingThread,SIGNAL(newFrame(QImage)),this,SLOT(updateFrame(QImage)),Qt::UniqueConnection);
@@ -259,10 +289,11 @@ void MainWindow::connectToStart()
     }
 }
 
+
 void MainWindow::updateData(const QString data)
 {
     controller->sendThread->receive(data);
-    ui->datalabel->setText(data);
+    //ui->datalabel->setText(data);
 }
 
 void MainWindow::about()
@@ -291,23 +322,11 @@ void MainWindow::setBS(bool input)
     emit newProcessingFlags(processingFlags);
 }// setBS()
 
-void MainWindow::setColor(bool input)
-{
-    // Not checked
-    if(!input)
-        processingFlags.colorOn =false;
-    // Checked
-    else if(input)
-        processingFlags.colorOn =true;
-    // Update processing flags in processingThread
-    emit newProcessingFlags(processingFlags);
-}// setColor()
-
 void MainWindow::updateFrame(const QImage &frame)
 {
     // Show [number of images in buffer / image buffer size] in imageBufferLabel in main window
     ui->imageBufferLabel->setText(QString("[")+QString::number(controller->processingThread->getCurrentSizeOfBuffer())+
-                              QString("/")+QString::number(imageBufferSize)+QString("]"));
+                                  QString("/")+QString::number(imageBufferSize)+QString("]"));
     // Show percentage of image bufffer full in imageBufferBar in main window
     ui->imageBufferBar->setValue(controller->processingThread->getCurrentSizeOfBuffer());
     // Show processing rate in captureRateLabel in main window
@@ -318,9 +337,9 @@ void MainWindow::updateFrame(const QImage &frame)
     ui->processingRateLabel->setText(ui->processingRateLabel->text()+" fps");
     // Show ROI information in roiLabel in main window
     ui->roiLabel->setText(QString("(")+QString::number(controller->processingThread->getCurrentROI().x)+QString(",")+
-                      QString::number(controller->processingThread->getCurrentROI().y)+QString(") ")+
-                      QString::number(controller->processingThread->getCurrentROI().width)+
-                      QString("x")+QString::number(controller->processingThread->getCurrentROI().height));
+                          QString::number(controller->processingThread->getCurrentROI().y)+QString(") ")+
+                          QString::number(controller->processingThread->getCurrentROI().width)+
+                          QString("x")+QString::number(controller->processingThread->getCurrentROI().height));
     // Display frame in main window
     ui->frameLabel->setPixmap(QPixmap::fromImage(frame));
     ui->frameLabel_2->setPixmap(QPixmap::fromImage(frame));
@@ -341,8 +360,8 @@ void MainWindow::updateMouseCursorPosLabel()
 {
     // Update mouse cursor position in mouseCursorPosLabel in main window
     ui->mouseCursorPosLabel->setText(QString("(")+QString::number(ui->frameLabel->getMouseCursorPos().x())+
-                                 QString(",")+QString::number(ui->frameLabel->getMouseCursorPos().y())+
-                                 QString(")"));
+                                     QString(",")+QString::number(ui->frameLabel->getMouseCursorPos().y())+
+                                     QString(")"));
 } // updateMouseCursorPosLabel()
 
 void MainWindow::newMouseData(struct MouseData mouseData)
@@ -362,19 +381,19 @@ void MainWindow::newMouseData(struct MouseData mouseData)
         {
             // Selection box can also be drawn from bottom-right to top-left corner
             if(taskData.selectionBox.width()<0)
-                    {
-                        x_temp=taskData.selectionBox.x();
-                        width_temp=taskData.selectionBox.width();
-                        taskData.selectionBox.setX(x_temp+taskData.selectionBox.width());
-                        taskData.selectionBox.setWidth(width_temp*-1);
-                    }
-                    if(taskData.selectionBox.height()<0)
-                    {
-                        y_temp=taskData.selectionBox.y();
-                        height_temp=taskData.selectionBox.height();
-                        taskData.selectionBox.setY(y_temp+taskData.selectionBox.height());
-                        taskData.selectionBox.setHeight(height_temp*-1);
-                    }
+            {
+                x_temp=taskData.selectionBox.x();
+                width_temp=taskData.selectionBox.width();
+                taskData.selectionBox.setX(x_temp+taskData.selectionBox.width());
+                taskData.selectionBox.setWidth(width_temp*-1);
+            }
+            if(taskData.selectionBox.height()<0)
+            {
+                y_temp=taskData.selectionBox.y();
+                height_temp=taskData.selectionBox.height();
+                taskData.selectionBox.setY(y_temp+taskData.selectionBox.height());
+                taskData.selectionBox.setHeight(height_temp*-1);
+            }
             // Check if selection box is not outside window
             if((taskData.selectionBox.x()<0)||(taskData.selectionBox.y()<0)||
                     ((taskData.selectionBox.x()+taskData.selectionBox.width())>sourceWidth)||
@@ -417,7 +436,11 @@ void MainWindow::newMouseData(struct MouseData mouseData)
 void MainWindow::initializeProcessingFlagsStructure()
 {
     processingFlags.bsOn=false;
-    processingFlags.colorOn=false;
+    processingFlags.playOn=false;
+    processingFlags.rgbOn=false;
+    processingFlags.hsvOn=false;
+    processingFlags.ycrcbOn=false;
+
 } // initializeProcessingFlagsStructure()
 
 void MainWindow::initializeTaskDataStructure()
@@ -463,15 +486,181 @@ void MainWindow::signalSlotsInit()
     connect(ui->SerialAction,SIGNAL(triggered()),this, SLOT(connectToSerial()));
     connect(ui->exitAction, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->StartAction, SIGNAL(triggered()),this, SLOT(connectToStart()));
-
     connect(ui->BSAction,SIGNAL(toggled(bool)), this, SLOT(setBS(bool)));
-    //connect(ui->ColorAction,SIGNAL(toggled(bool)), this, SLOT(setColor(bool)));
-
     connect(ui->settingsAction, SIGNAL(triggered()), this, SLOT(setProcessingSettings()));
     connect(ui->aboutAction, SIGNAL(triggered()), this, SLOT(about()));
     connect(ui->clearImageBufferButton, SIGNAL(released()), this, SLOT(clearImageBuffer()));
     connect(ui->frameLabel, SIGNAL(onMouseMoveEvent()), this, SLOT(updateMouseCursorPosLabel()));
+
+    connect(ui->actionRGB,SIGNAL(toggled(bool)),this,SLOT(setColorRGB(bool)));
+    connect(ui->actionHSV,SIGNAL(toggled(bool)),this,SLOT(setColorHSV(bool)));
+    connect(ui->actionYCrCb,SIGNAL(toggled(bool)),this,SLOT(setColorYCrCb(bool)));
+
+    connect(ui->actionTeam,SIGNAL(toggled(bool)),this,SLOT(setTeam(bool)));
+    connect(ui->actionRobot1,SIGNAL(toggled(bool)),this,SLOT(setRobot1(bool)));
+    connect(ui->actionRobot2,SIGNAL(toggled(bool)),this,SLOT(setRobot2(bool)));
+    connect(ui->actionBall,SIGNAL(toggled(bool)),this,SLOT(setBall(bool)));
     // Create connection between frameLabel (emitter) and GUI thread (receiver/listener)
     qRegisterMetaType<struct MouseData>("MouseData");
     connect(ui->frameLabel,SIGNAL(newMouseData(struct MouseData)),this,SLOT(newMouseData(struct MouseData)));
+
+
 } // signalSlotsInit()
+
+void MainWindow::setColorRGB(bool input)
+{
+    if(!input)
+        rgbOn=false;
+    else if(input)
+    {
+        rgbOn=true;
+        setColorModel(1);
+    }
+}
+
+void MainWindow::setColorHSV(bool input)
+{
+    if(!input)
+        hsvOn=false;
+    else if(input)
+    {
+        hsvOn=true;
+        setColorModel(2);
+    }
+}
+
+void MainWindow::setColorYCrCb(bool input)
+{
+    if(!input)
+        ycrcbOn=false;
+    else if(input)
+    {
+        ycrcbOn=true;
+        setColorModel(3);
+    }
+}
+
+void MainWindow::setColorModel(int type)
+{
+    if(type==1)
+    {
+        ui->actionHSV->setChecked(false);
+        hsvOn=false;
+        ui->actionYCrCb->setChecked(false);
+        ycrcbOn=false;
+    }
+    else if(type==2)
+    {
+        ui->actionRGB->setChecked(false);
+        rgbOn=false;
+        ui->actionYCrCb->setChecked(false);
+        ycrcbOn=false;
+    }
+    else if(type==3)
+    {
+        ui->actionRGB->setChecked(false);
+        rgbOn=false;
+        ui->actionHSV->setChecked(false);
+    }
+    processingFlags.rgbOn=rgbOn;
+    processingFlags.hsvOn=hsvOn;
+    processingFlags.ycrcbOn=ycrcbOn;
+    emit newProcessingFlags(processingFlags);
+}
+
+void MainWindow::setTeam(bool input)
+{
+    if(!input)
+        teamOn=false;
+    else if(input)
+    {
+        teamOn=true;
+        setObject(1);
+    }
+}
+
+void MainWindow::setRobot1(bool input)
+{
+    if(!input)
+        robot1On=false;
+    else if(input)
+    {
+        robot1On=true;
+        setObject(2);
+    }
+}
+
+void MainWindow::setRobot2(bool input)
+{
+    if(!input)
+        robot2On=false;
+    else if(input)
+    {
+        robot2On =true;
+        setObject(3);
+    }
+}
+
+void MainWindow::setBall(bool input)
+{
+    if(!input)
+        ballOn=false;
+    else if(input)
+    {
+        ballOn =true;
+        setObject(4);
+    }
+}
+
+void MainWindow::setObject(int type)
+{
+    if(!isPlay)
+    {
+        if(type==1)
+        {
+            ui->actionRobot1->setChecked(false);
+            robot1On=false;
+            ui->actionRobot2->setChecked(false);
+            robot2On=false;
+            ui->actionBall->setChecked(false);
+            ballOn=false;
+        }
+        else if(type==2)
+        {
+            ui->actionTeam->setChecked(false);
+            teamOn=false;
+            ui->actionRobot2->setChecked(false);
+            robot2On=false;
+            ui->actionBall->setChecked(false);
+            ballOn=false;
+        }
+        else if(type==3)
+        {
+            ui->actionTeam->setChecked(false);
+            teamOn=false;
+            ui->actionRobot1->setChecked(false);
+            robot1On=false;
+            ui->actionBall->setChecked(false);
+            ballOn=false;
+        }
+        else if(type==4)
+        {
+            ui->actionTeam->setChecked(false);
+            teamOn=false;
+            ui->actionRobot1->setChecked(false);
+            robot1On=false;
+            ui->actionRobot2->setChecked(false);
+            robot2On=false;
+        }
+    }
+    processingFlags.teamOn=teamOn;
+    processingFlags.robot1On=robot1On;
+    processingFlags.robot2On=robot2On;
+    processingFlags.ballOn=ballOn;
+    emit newProcessingFlags(processingFlags);
+}
+void MainWindow::play()
+{
+    isPlay=!isPlay;
+    emit newProcessingFlags(processingFlags);
+}

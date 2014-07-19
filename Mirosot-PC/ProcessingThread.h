@@ -58,16 +58,28 @@ private:
     cv::Size frameSize;
     cv::Point framePoint;
     // Processing flags
+    bool playOn;
     bool bsOn;
-    bool colorOn;
+    bool rgbOn;
+    bool hsvOn;
+    bool ycrcbOn;
     // Processing settings
-    int ColorType;
-    int ColorParam1;
-    int ColorParam2;
-    int ColorParam3;
-    int ColorParam1_2;
-    int ColorParam2_2;
-    int ColorParam3_2;
+    //Team
+    int TeamColorType;
+    cv::Scalar Teammin;
+    cv::Scalar Teammax;
+    //Robot1
+    int Robot1ColorType;
+    cv::Scalar Robot1min;
+    cv::Scalar Robot1max;
+    //Robot2
+    int Robot2ColorType;
+    cv::Scalar Robot2min;
+    cv::Scalar Robot2max;
+    //Ball
+    int BallColorType;
+    cv::Scalar Ballmin;
+    cv::Scalar Ballmax;
 
     int BSNumberOfIterations;
     // Task data

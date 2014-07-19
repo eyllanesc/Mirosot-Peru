@@ -12,27 +12,55 @@
 
 // ProcessingSettings structure definition
 struct ProcessingSettings{
-    int ColorType;
+    int TeamColorType;
+    int Robot1ColorType;
+    int Robot2ColorType;
+    int BallColorType;
 
-    int ColorParam1;
-    int ColorParam2;
-    int ColorParam3;
-    int ColorParam1_2;
-    int ColorParam2_2;
-    int ColorParam3_2;
+    int TeamChannel1min;
+    int TeamChannel1max;
+    int TeamChannel2min;
+    int TeamChannel2max;
+    int TeamChannel3min;
+    int TeamChannel3max;
+
+    int Robot1Channel1min;
+    int Robot1Channel1max;
+    int Robot1Channel2min;
+    int Robot1Channel2max;
+    int Robot1Channel3min;
+    int Robot1Channel3max;
+
+    int Robot2Channel1min;
+    int Robot2Channel1max;
+    int Robot2Channel2min;
+    int Robot2Channel2max;
+    int Robot2Channel3min;
+    int Robot2Channel3max;
+
+    int BallChannel1min;
+    int BallChannel1max;
+    int BallChannel2min;
+    int BallChannel2max;
+    int BallChannel3min;
+    int BallChannel3max;
 
     int BSNumberOfIterations;
-    int flipCode;
-    double cannyThreshold1;
-    double cannyThreshold2;
-    int cannyApertureSize;
-    bool cannyL2gradient;
 };
 
 // ProcessingFlags structure definition
 struct ProcessingFlags{
+    bool playOn;
+    bool rgbOn;
+    bool hsvOn;
+    bool ycrcbOn;
+
     bool bsOn;
-    bool colorOn;
+
+    bool teamOn;
+    bool robot1On;
+    bool robot2On;
+    bool ballOn;
 };
 
 // TaskData structure definition

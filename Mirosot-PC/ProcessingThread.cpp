@@ -98,9 +98,9 @@ void ProcessingThread::run()
                     bg.operator()(currentFrameCopy,fore,0);
                 }
             }
-            if(colorOn)
-            {
-                switch (ColorType) {
+            //if(colorOn)
+            //{
+                /*switch (ColorType) {
                 case 0:
                     cv::inRange(currentFrameCopy,
                                 cv::Scalar(ColorParam1,ColorParam2,ColorParam3),
@@ -126,20 +126,20 @@ void ProcessingThread::run()
                                 currentFrameCopybin);
                 default:
                     break;
-                }
-            }
+                }*/
+            //}
         }
         ////////////////////////////////////
         // PERFORM IMAGE PROCESSING ABOVE //
         ////////////////////////////////////
 
         //// Convert Mat to QImage: Show grayscale frame [if either Grayscale or Canny processing modes are ON]
-        if(bsOn && !colorOn)
+        /*if(bsOn && !colorOn)
         {
-            if(BSNumberOfIterations)
-                frame=MatToQImage(currentFrameCopy);
-            else
-                frame=MatToQImage(fore);
+          //  if(BSNumberOfIterations)
+              //  frame=MatToQImage(currentFrameCopy);
+            //else
+                //frame=MatToQImage(fore);
         }
         else if(!bsOn && colorOn)
             frame=MatToQImage(currentFrameCopybin);
@@ -156,7 +156,7 @@ void ProcessingThread::run()
         else
             frame=MatToQImage(currentFrameCopy);
         //// Convert Mat to QImage: Show BGR frame
-
+*/
         updateMembersMutex.unlock();
 
         // Update statistics
@@ -226,20 +226,27 @@ void ProcessingThread::resetROI()
 void ProcessingThread::updateProcessingFlags(struct ProcessingFlags processingFlags)
 {
     QMutexLocker locker(&updateMembersMutex);
+    playOn=processingFlags.playOn;
     bsOn=processingFlags.bsOn;
-    colorOn=processingFlags.colorOn;
+    rgbOn=processingFlags.rgbOn;
+    hsvOn=processingFlags.hsvOn;
+    ycrcbOn=processingFlags.ycrcbOn;
+
 } // updateProcessingFlags()
 
 void ProcessingThread::updateProcessingSettings(struct ProcessingSettings processingSettings)
 {
     QMutexLocker locker(&updateMembersMutex);
-    ColorType=processingSettings.ColorType;
-    ColorParam1 = processingSettings.ColorParam1;
-    ColorParam2 = processingSettings.ColorParam2;
-    ColorParam3 = processingSettings.ColorParam3;
-    ColorParam1_2 = processingSettings.ColorParam1_2;
-    ColorParam2_2 = processingSettings.ColorParam2_2;
-    ColorParam3_2 = processingSettings.ColorParam3_2;
+
+    Teammin=cv::Scalar(processingSettings.TeamChannel1min,processingSettings.TeamChannel2min,processingSettings.TeamChannel3min);
+    Teammax=cv::Scalar(processingSettings.TeamChannel1max,processingSettings.TeamChannel2max,processingSettings.TeamChannel3max);
+    Robot1min=cv::Scalar(processingSettings.Robot1Channel1min,processingSettings.Robot1Channel2min,processingSettings.Robot1Channel3min);
+    Robot1max=cv::Scalar(processingSettings.Robot1Channel1max,processingSettings.Robot1Channel2max,processingSettings.Robot1Channel3max);
+    Robot2min=cv::Scalar(processingSettings.Robot2Channel1min,processingSettings.Robot2Channel2min,processingSettings.Robot2Channel3min);
+    Robot2max=cv::Scalar(processingSettings.Robot2Channel1max,processingSettings.Robot2Channel2max,processingSettings.Robot2Channel3max);
+    Ballmin=cv::Scalar(processingSettings.BallChannel1min,processingSettings.BallChannel2min,processingSettings.BallChannel3min);
+    Ballmax=cv::Scalar(processingSettings.BallChannel1max,processingSettings.BallChannel2max,processingSettings.BallChannel3max);
+
     BSNumberOfIterations=processingSettings.BSNumberOfIterations;
 } // updateProcessingSettings()
 

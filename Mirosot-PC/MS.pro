@@ -6,6 +6,7 @@
 QT       += core gui
 CONFIG  += qxt
 QXT     += core gui
+
 TARGET = MS
 
 TEMPLATE = app
@@ -28,7 +29,8 @@ SOURCES += main.cpp\
     ProcessingSettingsDialog.cpp \
     MatToQImage.cpp \
     settingsdialog.cpp \
-    SendThread.cpp
+    SendThread.cpp \
+    qledindicator.cpp
 
 HEADERS  += MainWindow.h \
     CaptureThread.h \
@@ -42,12 +44,13 @@ HEADERS  += MainWindow.h \
     Config.h \
     MatToQImage.h \
     settingsdialog.h \
-    SendThread.h
+    SendThread.h \
+    qledindicator.h
 
 unix: CONFIG += link_pkgconfig \
     serialport
 unix: PKGCONFIG += opencv \
-    cvblob
+#    cvblob
 
 OTHER_FILES += \
     README.md

@@ -21,6 +21,7 @@ class MainWindow;
 
 // Qt header files
 #include <QDebug>
+#include <QPushButton>
 
 #define QUOTE_(x) #x
 #define QUOTE(x) QUOTE_(x)
@@ -42,6 +43,7 @@ public:
     void setInitGUIState();
     void initializeGUI();
     void signalSlotsInit();
+    void connectToPlay();
 private:
      Ui::MainWindow *ui;
     CameraConnectDialog *cameraConnectDialog;
@@ -54,15 +56,28 @@ private:
     QString appVersion;
     int sourceWidth;
     int sourceHeight;
-
+    QPushButton *playCtl;
     int deviceNumber;
     int imageBufferSize;
     Settings settings;
     bool isCameraConnected;
     bool isPortConnected;
-
+    bool isPlay;
     bool isCamera;
     bool isSerial;
+
+    bool rgbOn;
+    bool hsvOn;
+    bool ycrcbOn;
+
+    bool teamOn;
+    bool robot1On;
+    bool robot2On;
+    bool ballOn;
+
+    void setColorModel(int);
+    void setObject(int);
+
 public slots:
     void connectToStart();
     void connectToCamera();
@@ -70,7 +85,6 @@ public slots:
     void about();
     void clearImageBuffer();
     void setBS(bool);
-    void setColor(bool);
     void setProcessingSettings();
     void updateMouseCursorPosLabel();
     void newMouseData(struct MouseData);
@@ -78,6 +92,16 @@ private slots:
     void updateFrame(const QImage &frame);
     void updateData(const QString data);
     void readData();
+    void play();
+
+    void setTeam(bool);
+    void setRobot1(bool);
+    void setRobot2(bool);
+    void setBall(bool);
+
+    void setColorRGB(bool);
+    void setColorHSV(bool);
+    void setColorYCrCb(bool);
 signals:
     void newProcessingFlags(struct ProcessingFlags p_flags);
     void newTaskData(struct TaskData taskData);

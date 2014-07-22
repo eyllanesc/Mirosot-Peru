@@ -22,4 +22,6 @@
 // BS
 #define DEFAULT_BS_ITERATIONS 100
 
+#define LAMBDA 3.5
+
 #endif // CONFIG_H

@@ -51,11 +51,10 @@ struct ProcessingSettings{
 // ProcessingFlags structure definition
 struct ProcessingFlags{
     bool playOn;
-    bool rgbOn;
-    bool hsvOn;
-    bool ycrcbOn;
 
     bool bsOn;
+
+    bool campOn;
 
     bool teamOn;
     bool robot1On;

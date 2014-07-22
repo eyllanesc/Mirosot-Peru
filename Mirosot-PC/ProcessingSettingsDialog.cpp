@@ -30,7 +30,67 @@ ProcessingSettingsDialog::ProcessingSettingsDialog(QWidget *parent) :
     resetAllDialogToDefaults();
     // Update processing settings in processingSettings structure and processingThread
     updateStoredSettingsFromDialog();
+    updateDialogSettingsFromStored();
 } // ProcessingSettingsDialog constructor
+
+void ProcessingSettingsDialog::updateProcessingSettings(struct ProcessingSettings processingSettings)
+{
+    //Team
+    if(processingSettings.TeamColorType==0)
+        ui->TeamColorRGBButton->setChecked(true);
+    else if(processingSettings.TeamColorType==1)
+        ui->TeamColorHSVButton->setChecked(true);
+    else if(processingSettings.TeamColorType==2)
+        ui->TeamColorYCrCbButton->setChecked(true);
+    ui->TeamChannel1qxtSpanSlider->setLowerValue(processingSettings.TeamChannel1min);
+    ui->TeamChannel1qxtSpanSlider->setUpperValue(processingSettings.TeamChannel1max);
+    ui->TeamChannel2qxtSpanSlider->setLowerValue(processingSettings.TeamChannel2min);
+    ui->TeamChannel2qxtSpanSlider->setUpperValue(processingSettings.TeamChannel2max);
+    ui->TeamChannel3qxtSpanSlider->setLowerValue(processingSettings.TeamChannel3min);
+    ui->TeamChannel3qxtSpanSlider->setUpperValue(processingSettings.TeamChannel3max);
+
+    //Robot1
+    if(processingSettings.Robot1ColorType==0)
+        ui->Robot1ColorRGBButton->setChecked(true);
+    else if(processingSettings.Robot1ColorType==1)
+        ui->Robot1ColorHSVButton->setChecked(true);
+    else if(processingSettings.Robot1ColorType==2)
+        ui->Robot1ColorYCrCbButton->setChecked(true);
+    ui->Robot1Channel1qxtSpanSlider->setLowerValue(processingSettings.Robot1Channel1min);
+    ui->Robot1Channel1qxtSpanSlider->setUpperValue(processingSettings.Robot1Channel1max);
+    ui->Robot1Channel2qxtSpanSlider->setLowerValue(processingSettings.Robot1Channel2min);
+    ui->Robot1Channel2qxtSpanSlider->setUpperValue(processingSettings.Robot1Channel2max);
+    ui->Robot1Channel3qxtSpanSlider->setLowerValue(processingSettings.Robot1Channel3min);
+    ui->Robot1Channel3qxtSpanSlider->setUpperValue(processingSettings.Robot1Channel3max);
+
+    //Robot2
+    if(processingSettings.Robot2ColorType==0)
+        ui->Robot2ColorRGBButton->setChecked(true);
+    else if(processingSettings.Robot2ColorType==1)
+        ui->Robot2ColorHSVButton->setChecked(true);
+    else if(processingSettings.Robot2ColorType==2)
+        ui->Robot2ColorYCrCbButton->setChecked(true);
+    ui->Robot2Channel1qxtSpanSlider->setLowerValue(processingSettings.Robot2Channel1min);
+    ui->Robot2Channel1qxtSpanSlider->setUpperValue(processingSettings.Robot2Channel1max);
+    ui->Robot2Channel2qxtSpanSlider->setLowerValue(processingSettings.Robot2Channel2min);
+    ui->Robot2Channel2qxtSpanSlider->setUpperValue(processingSettings.Robot2Channel2max);
+    ui->Robot2Channel3qxtSpanSlider->setLowerValue(processingSettings.Robot2Channel3min);
+    ui->Robot2Channel3qxtSpanSlider->setUpperValue(processingSettings.Robot2Channel3max);
+
+    //Ball
+    if(processingSettings.BallColorType==0)
+        ui->BallColorRGBButton->setChecked(true);
+    else if(processingSettings.BallColorType==1)
+        ui->BallColorHSVButton->setChecked(true);
+    else if(processingSettings.BallColorType==2)
+        ui->BallColorYCrCbButton->setChecked(true);
+    ui->BallChannel1qxtSpanSlider->setLowerValue(processingSettings.BallChannel1min);
+    ui->BallChannel1qxtSpanSlider->setUpperValue(processingSettings.BallChannel1max);
+    ui->BallChannel2qxtSpanSlider->setLowerValue(processingSettings.BallChannel2min);
+    ui->BallChannel2qxtSpanSlider->setUpperValue(processingSettings.BallChannel2max);
+    ui->BallChannel3qxtSpanSlider->setLowerValue(processingSettings.BallChannel3min);
+    ui->BallChannel3qxtSpanSlider->setUpperValue(processingSettings.BallChannel3max);
+}
 
 void ProcessingSettingsDialog::updateDialogSettingsFromStored()
 {
@@ -283,122 +343,206 @@ void ProcessingSettingsDialog::resetAllDialogToDefaults()
 void ProcessingSettingsDialog::on_TeamChannel1qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->TeamChannel1min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_TeamChannel1qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->TeamChannel1max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_TeamChannel2qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->TeamChannel2min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_TeamChannel2qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->TeamChannel2max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_TeamChannel3qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->TeamChannel3min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_TeamChannel3qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->TeamChannel3max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 //Robot2
 void ProcessingSettingsDialog::on_Robot2Channel1qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->Robot2Channel1min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot2Channel1qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->Robot2Channel1max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot2Channel2qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->Robot2Channel2min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot2Channel2qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->Robot2Channel2max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot2Channel3qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->Robot2Channel3min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot2Channel3qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->Robot2Channel3max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 //Robot1
 void ProcessingSettingsDialog::on_Robot1Channel1qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->Robot1Channel1min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot1Channel1qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->Robot1Channel1max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot1Channel2qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->Robot1Channel2min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot1Channel2qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->Robot1Channel2max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot1Channel3qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->Robot1Channel3min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_Robot1Channel3qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->Robot1Channel3max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 //Ball
 void ProcessingSettingsDialog::on_BallChannel1qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->BallChannel1min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_BallChannel1qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->BallChannel1max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_BallChannel2qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->BallChannel2min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_BallChannel2qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->BallChannel2max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_BallChannel3qxtSpanSlider_lowerValueChanged(int lower)
 {
     ui->BallChannel3min->setText(QString::number(lower));
+    updateStoredSettingsFromDialog();
 }
 
 void ProcessingSettingsDialog::on_BallChannel3qxtSpanSlider_upperValueChanged(int upper)
 {
     ui->BallChannel3max->setText(QString::number(upper));
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_TeamColorRGBButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_TeamColorHSVButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_TeamColorYCrCbButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_Robot1ColorRGBButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_Robot1ColorHSVButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_Robot1ColorYCrCbButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_Robot2ColorRGBButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_Robot2ColorHSVButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_Robot2ColorYCrCbButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_BallColorRGBButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_BallColorHSVButton_clicked()
+{
+    updateStoredSettingsFromDialog();
+}
+
+void ProcessingSettingsDialog::on_BallColorYCrCbButton_clicked()
+{
+    updateStoredSettingsFromDialog();
 }

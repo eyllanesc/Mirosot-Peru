@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>425</width>
+    <width>480</width>
     <height>410</height>
    </rect>
   </property>
@@ -18,18 +18,22 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>425</width>
+    <width>480</width>
     <height>410</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>425</width>
+    <width>480</width>
     <height>410</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Calibration Settings</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="MyResource.qrc">
+    <normaloff>:/images/logo.png</normaloff>:/images/logo.png</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
@@ -39,8 +43,8 @@
     <rect>
      <x>15</x>
      <y>14</y>
-     <width>395</width>
-     <height>301</height>
+     <width>447</width>
+     <height>300</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -54,7 +58,7 @@
 </string>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="BSTab">
     <attribute name="title">
@@ -1492,11 +1496,106 @@
      </widget>
     </widget>
    </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Camp</string>
+    </attribute>
+    <widget class="QLabel" name="widthlabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>40</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Width:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="heightlabel">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>80</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Height:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="widthline">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>34</y>
+       <width>41</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>130</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="heightline">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>76</y>
+       <width>41</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>150</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>145</x>
+       <y>40</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[cm]</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>145</x>
+       <y>80</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>[cm]</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QDialogButtonBox" name="okCancelBox">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>280</x>
      <y>370</y>
      <width>176</width>
      <height>31</height>
@@ -1538,9 +1637,9 @@
   <widget class="Line" name="line_1">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>15</x>
      <y>350</y>
-     <width>395</width>
+     <width>447</width>
      <height>20</height>
     </rect>
    </property>
@@ -1572,7 +1671,9 @@
   <tabstop>resetAllToDefaultsButton</tabstop>
   <tabstop>okCancelBox</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="MyResource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>okCancelBox</sender>

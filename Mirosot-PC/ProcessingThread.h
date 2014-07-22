@@ -32,6 +32,7 @@ public:
     int getAvgFPS();
     int getCurrentSizeOfBuffer();
     cv::Rect getCurrentROI();
+    ProcessingSettings psettings;
 private:
     void updateFPS(int);
     void setROI();
@@ -43,10 +44,19 @@ private:
     int currentSizeOfBuffer;
     cv::Mat currentFrameCopy;
     cv::Mat currentFrameCopybin;
+    cv::Mat currentFrameCopy2;
     cv::Rect originalROI;
     cv::Rect currentROI;
+
+    cv::Rect campROI;
+
+    cv::Scalar meantmp;
+    cv::Scalar stdtmp;
+
     QString data;
     QImage frame;
+    QImage frame1;
+    QImage hist;
     QTime t;
     int processingTime;
     QQueue<int> fps;
@@ -57,13 +67,12 @@ private:
     QMutex updateMembersMutex;
     cv::Size frameSize;
     cv::Point framePoint;
+
+    cv::Size temp;
     // Processing flags
     bool playOn;
     bool bsOn;
-    bool rgbOn;
-    bool hsvOn;
-    bool ycrcbOn;
-
+    bool campOn;
     bool teamOn;
     bool robot1On;
     bool robot2On;
@@ -105,7 +114,10 @@ private slots:
     void updatePosData(struct PosData);
 signals:
     void newFrame(const QImage &frame);
+    void newFrame2(const QImage &frame);
     void newData(const QString data);
+    void newProcessingSettings(struct ProcessingSettings p_settings);
+    void newHistogram(const QImage &hist);
 };
 
 #endif // PROCESSINGTHREAD_H

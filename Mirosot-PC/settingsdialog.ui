@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Connect to Serial Port</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="MyResource.qrc">
+    <normaloff>:/images/logo.png</normaloff>:/images/logo.png</iconset>
+  </property>
   <widget class="QGroupBox" name="parametersBox">
    <property name="geometry">
     <rect>
@@ -180,7 +184,9 @@
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="MyResource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>okCancelBox</sender>

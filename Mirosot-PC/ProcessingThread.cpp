@@ -9,7 +9,8 @@
 ProcessingThread::ProcessingThread(ImageBuffer *imageBuffer, int inputSourceWidth, int inputSourceHeight): QThread(),  imageBuffer(imageBuffer), inputSourceWidth(inputSourceWidth), inputSourceHeight(inputSourceHeight)
 {
     // Create images
-    currentFrameCopy.create(cv::Size(inputSourceWidth,inputSourceHeight),CV_8UC3);
+    currentFrameCopy.create(cv::Size(inputSourceWidth,inputSourceHeight),CV_8UC3);//window 1
+    currentFrameCopy2.create(cv::Size(inputSourceWidth,inputSourceHeight),CV_8UC3);//window 2
     currentFrameCopybin.create(cv::Size(inputSourceWidth,inputSourceHeight),CV_8UC1);
     // Initialize variables
     stopped=false;
@@ -17,8 +18,14 @@ ProcessingThread::ProcessingThread(ImageBuffer *imageBuffer, int inputSourceWidt
     fpsSum=0;
     avgFPS=0;
     fps.clear();
+    TeamColorType=0;
+    Robot1ColorType=0;
+    Robot2ColorType=0;
+    BallColorType=0;
+    playOn=false;
     // Initialize currentROI variable
     currentROI=cv::Rect(0,0,inputSourceWidth,inputSourceHeight);
+    campROI=currentROI;
     // Store original ROI
     originalROI=currentROI;
     isPos=false;
@@ -37,12 +44,19 @@ void ProcessingThread::run()
     cv::BackgroundSubtractorMOG2 bg;
     bg.set("nmixtures",5);
     bg.set("detectShadows",false);
+    cv::Mat HSVcurrentFrame;
+    cv::Mat YCrCbcurrentFrame;
     cv::Mat fore;
-    cv::Mat foreandcolor;
+    std::vector<cv::Mat> bgr_planes;
+    int histSize = 256;
+    float range[] = {0,256} ;
+    const float* histRange = { range };
+    cv::Mat b_hist, g_hist, r_hist;
+    int bin_w;
+    int hist_w = 256; int hist_h = 400;
     float angle=0;
     while(true)
     {
-
         /////////////////////////////////
         // Stop thread if stopped=TRUE //
         /////////////////////////////////
@@ -56,7 +70,6 @@ void ProcessingThread::run()
         stoppedMutex.unlock();
         /////////////////////////////////
         /////////////////////////////////
-
         // Save processing time
         processingTime=t.elapsed();
         // Start timer (used to calculate processing rate)
@@ -65,14 +78,10 @@ void ProcessingThread::run()
         cv::Mat currentFrame=imageBuffer->getFrame();
         // Make copy of current frame (processing will be performed on this copy)
         currentFrame.copyTo(currentFrameCopy);
-
-        line(currentFrameCopy, initial, final, CV_RGB(255, 255, 0), 2, CV_AA);
-        circle(currentFrameCopy , initial, 3, CV_RGB(255, 0, 255), 2, CV_AA);
-        circle(currentFrameCopy , final, 3, CV_RGB(0, 255, 255), 2, CV_AA);
-        // Set ROI of currentFrameCopy
-        //currentFrameCopy.locateROI(frameSize,framePoint);
-        //currentFrameCopy.adjustROI(-currentROI.y,-(frameSize.height-currentROI.height-currentROI.y),                           -currentROI.x,-(frameSize.width-currentROI.width-currentROI.x));
-
+        currentFrame.copyTo(currentFrameCopy2);
+        //line(currentFrameCopy, initial, final, CV_RGB(255, 255, 0), 2, CV_AA);
+        //circle(currentFrameCopy , initial, 3, CV_RGB(255, 0, 255), 2, CV_AA);
+        //circle(currentFrameCopy , final, 3, CV_RGB(0, 255, 255), 2, CV_AA);
         updateMembersMutex.lock();
         ///////////////////
         // PERFORM TASKS //
@@ -80,86 +89,185 @@ void ProcessingThread::run()
         if(resetROIFlag)
             resetROI();
         else if(setROIFlag)
+        {
             setROI();
-        ////////////////////////////////////
-        // PERFORM IMAGE PROCESSING BELOW //
-        ////////////////////////////////////
+            if(!playOn)
+            {
+                currentFrameCopy.locateROI(frameSize,framePoint);
+                currentFrameCopy.adjustROI(-currentROI.y,-(frameSize.height-currentROI.height-currentROI.y),                           -currentROI.x,-(frameSize.width-currentROI.width-currentROI.x));
+                if(campOn)
+                {
+                    campROI=currentROI;
+                }
+                else{
+                    if(teamOn)
+                    {
+                        if(TeamColorType==1)//HSV
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2HSV);
+                        else if(TeamColorType==2)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
+                        cv::meanStdDev(currentFrameCopy,meantmp,stdtmp);
+                        Teammin=cv::Scalar(int(meantmp.val[0]-LAMBDA*stdtmp.val[0]),int(meantmp.val[1]-LAMBDA*stdtmp.val[1]),int(meantmp.val[2]-LAMBDA*stdtmp.val[2]));
+                        Teammax=cv::Scalar(int(meantmp.val[0]+LAMBDA*stdtmp.val[0]),int(meantmp.val[1]+LAMBDA*stdtmp.val[1]),int(meantmp.val[2]+LAMBDA*stdtmp.val[2]));
+                        psettings.TeamColorType=TeamColorType;
+                        psettings.TeamChannel1min=Teammin.val[0];
+                        psettings.TeamChannel1max=Teammax.val[0];
+                        psettings.TeamChannel2min=Teammin.val[1];
+                        psettings.TeamChannel2max=Teammax.val[1];
+                        psettings.TeamChannel3min=Teammin.val[2];
+                        psettings.TeamChannel3max=Teammax.val[2];
+                        emit newProcessingSettings(psettings);
+                    }
+                    else if(robot1On)
+                    {
+                        if(Robot1ColorType==1)//HSV
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2HSV);
+                        else if(Robot1ColorType ==2)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
+                        cv::meanStdDev(currentFrameCopy,meantmp,stdtmp);
+                        Robot1min=cv::Scalar(int(meantmp.val[0]-LAMBDA*stdtmp.val[0]),int(meantmp.val[1]-LAMBDA*stdtmp.val[1]),int(meantmp.val[2]-LAMBDA*stdtmp.val[2]));
+                        Robot1max=cv::Scalar(int(meantmp.val[0]+LAMBDA*stdtmp.val[0]),int(meantmp.val[1]+LAMBDA*stdtmp.val[1]),int(meantmp.val[2]+LAMBDA*stdtmp.val[2]));
+                        psettings.Robot1ColorType=Robot1ColorType;
+                        psettings.Robot1Channel1min=Robot1min.val[0];
+                        psettings.Robot1Channel1max=Robot1max.val[0];
+                        psettings.Robot1Channel2min=Robot1min.val[1];
+                        psettings.Robot1Channel2max=Robot1max.val[1];
+                        psettings.Robot1Channel3min=Robot1min.val[2];
+                        psettings.Robot1Channel3max=Robot1max.val[2];
+                        emit newProcessingSettings(psettings);
+                    }
+                    else if(robot2On)
+                    {
+                        if(Robot2ColorType==1)//HSV
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2HSV);
+                        else if(Robot2ColorType ==2)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
+                        cv::meanStdDev(currentFrameCopy,meantmp,stdtmp);
+                        psettings.Robot2ColorType=Robot2ColorType;
+                        Robot2min=cv::Scalar(int(meantmp.val[0]-LAMBDA*stdtmp.val[0]),int(meantmp.val[1]-LAMBDA*stdtmp.val[1]),int(meantmp.val[2]-LAMBDA*stdtmp.val[2]));
+                        Robot2max=cv::Scalar(int(meantmp.val[0]+LAMBDA*stdtmp.val[0]),int(meantmp.val[1]+LAMBDA*stdtmp.val[1]),int(meantmp.val[2]+LAMBDA*stdtmp.val[2]));
+                        psettings.Robot2Channel1min=Robot2min.val[0];
+                        psettings.Robot2Channel1max=Robot2max.val[0];
+                        psettings.Robot2Channel2min=Robot2min.val[1];
+                        psettings.Robot2Channel2max=Robot2max.val[1];
+                        psettings.Robot2Channel3min=Robot2min.val[2];
+                        psettings.Robot2Channel3max=Robot2max.val[2];
+                        emit newProcessingSettings(psettings);
+                    }
+                    else if(ballOn)
+                    {
+                        if(BallColorType==1)//HSV
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2HSV);
+                        else if(BallColorType ==2)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
+                        cv::meanStdDev(currentFrameCopy,meantmp,stdtmp);
+                        Ballmin=cv::Scalar(int(meantmp.val[0]-LAMBDA*stdtmp.val[0]),int(meantmp.val[1]-LAMBDA*stdtmp.val[1]),int(meantmp.val[2]-LAMBDA*stdtmp.val[2]));
+                        Ballmax=cv::Scalar(int(meantmp.val[0]+LAMBDA*stdtmp.val[0]),int(meantmp.val[1]+LAMBDA*stdtmp.val[1]),int(meantmp.val[2]+LAMBDA*stdtmp.val[2]));
+                        psettings.BallColorType=BallColorType;
+                        psettings.BallChannel1min=Ballmin.val[0];
+                        psettings.BallChannel1max=Ballmax.val[0];
+                        psettings.BallChannel2min=Ballmin.val[1];
+                        psettings.BallChannel2max=Ballmax.val[1];
+                        psettings.BallChannel3min=Ballmin.val[2];
+                        psettings.BallChannel3max=Ballmax.val[2];
+                        emit newProcessingSettings(psettings);
+                    }
+                    if(teamOn||robot1On||robot2On||ballOn)
+                    {
+                        cv::split( currentFrameCopy, bgr_planes );
+                        cv::Mat histImage( hist_h, hist_w, CV_8UC3, cv::Scalar( 0,0,0) );
+                        calcHist( &bgr_planes[0], 1, 0, cv::Mat(), b_hist, 1, &histSize, &histRange);
+                        calcHist( &bgr_planes[1], 1, 0, cv::Mat(), g_hist, 1, &histSize, &histRange);
+                        calcHist( &bgr_planes[2], 1, 0, cv::Mat(), r_hist, 1, &histSize, &histRange);
+                        bin_w = cvRound( (double) hist_w/histSize );
+                        cv::normalize(b_hist, b_hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+                        cv::normalize(g_hist, g_hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+                        cv::normalize(r_hist, r_hist, 0, histImage.rows, cv::NORM_MINMAX, -1, cv::Mat() );
+                        for( int i = 1; i < histSize; i++ )
+                        {
+                            cv::line( histImage,cv::Point( bin_w*(i-1),hist_h-cvRound(b_hist.at<float>(i-1))) ,cv::Point( bin_w*(i), hist_h-cvRound(b_hist.at<float>(i)) ),cv::Scalar( 255, 0, 0), 2, 8, 0 );
+                            cv::line( histImage, cv::Point( bin_w*(i-1), hist_h - cvRound(g_hist.at<float>(i-1)) ) ,cv::Point( bin_w*(i), hist_h - cvRound(g_hist.at<float>(i)) ),cv::Scalar( 0, 255, 0), 2, 8, 0 );
+                            cv::line( histImage, cv::Point( bin_w*(i-1), hist_h - cvRound(r_hist.at<float>(i-1)) ) ,cv::Point( bin_w*(i), hist_h - cvRound(r_hist.at<float>(i)) ),cv::Scalar( 0, 0, 255), 2, 8, 0 );
+                        }
+                        hist=MatToQImage(histImage);
+                        emit newHistogram(hist);
+                    }
+                }
+            }
+        }
         else
         {
-            if(bsOn)
+            currentFrameCopy.locateROI(frameSize,framePoint);
+            currentFrameCopy.adjustROI(-campROI.y,-(frameSize.height-campROI.height-campROI.y),-campROI.x,-(frameSize.width-campROI.width-campROI.x));
+            if(playOn)
             {
-                if(BSNumberOfIterations)
+                frame=MatToQImage(currentFrameCopy);
+                frame1=MatToQImage(fore);
+            }
+            else
+            {//Background Subtraction
+                if(bsOn)
                 {
-                    bg.operator ()(currentFrameCopy,fore);
-                    BSNumberOfIterations--;
+                    cv::cvtColor(currentFrame,HSVcurrentFrame,cv::COLOR_RGB2HSV);
+                    cv::cvtColor(currentFrame,YCrCbcurrentFrame,cv::COLOR_RGB2YCrCb);
+                    if(BSNumberOfIterations && !(teamOn||robot1On||robot2On||ballOn))
+                    {
+                        bg.operator ()(currentFrameCopy,fore);
+                        BSNumberOfIterations--;
+                        qDebug()<<"calibrando";
+                    }
+                    else
+                    {
+                        bg.operator()(currentFrameCopy,fore,0);
+                        BSNumberOfIterations=0;
+                        qDebug()<<"calibrado";
+                    }
+                    frame1=MatToQImage(fore);
+                }
+                else if(teamOn||robot1On||robot2On||ballOn)
+                {
+                    if(teamOn)
+                    {
+                        if(TeamColorType==1)//HSV
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2HSV);
+                        else if(TeamColorType==2)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
+                        cv::inRange(currentFrameCopy,Teammin,Teammax,currentFrameCopybin);
+                    }
+                    else if(robot1On)
+                    {
+                        if(Robot1ColorType==1)//HSV
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2HSV);
+                        else if(Robot1ColorType==2)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
+                        cv::inRange(currentFrameCopy,Robot1min,Robot1max,currentFrameCopybin);
+                    }
+                    else if(robot2On)
+                    {
+                        if(Robot2ColorType==1)//HSV
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2HSV);
+                        else if(Robot2ColorType==2)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
+                        cv::inRange(currentFrameCopy,Robot2min,Robot2max,currentFrameCopybin);
+                    }
+                    else if(ballOn)
+                    {
+                        if(BallColorType==1)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2HSV);
+                        else if(BallColorType==2)
+                            cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
+                        cv::inRange(currentFrameCopy,Ballmin,Ballmax,currentFrameCopybin);
+                    }
+                    frame1=MatToQImage(currentFrameCopybin);
                 }
                 else
                 {
-                    bg.operator()(currentFrameCopy,fore,0);
+                    frame1=MatToQImage(currentFrameCopy);
                 }
+                frame=MatToQImage(currentFrameCopy);
             }
-            //if(colorOn)
-            //{
-                /*switch (ColorType) {
-                case 0:
-                    cv::inRange(currentFrameCopy,
-                                cv::Scalar(ColorParam1,ColorParam2,ColorParam3),
-                                cv::Scalar(ColorParam1_2,ColorParam2_2,ColorParam3_2),
-                                currentFrameCopybin);
-                    break;
-                case 1:
-                    cv::cvtColor(currentFrameCopy,
-                                 currentFrameCopy,
-                                 cv::COLOR_RGB2HSV);
-                    cv::inRange(currentFrameCopy,
-                                cv::Scalar(ColorParam1,ColorParam2,ColorParam3),
-                                cv::Scalar(ColorParam1_2,ColorParam2_2,ColorParam3_2),
-                                currentFrameCopybin);
-                    break;
-                case 2:
-                    cv::cvtColor(currentFrameCopy,
-                                 currentFrameCopy,
-                                 cv::COLOR_RGB2YCrCb);
-                    cv::inRange(currentFrameCopy,
-                                cv::Scalar(ColorParam1,ColorParam2,ColorParam3),
-                                cv::Scalar(ColorParam1_2,ColorParam2_2,ColorParam3_2),
-                                currentFrameCopybin);
-                default:
-                    break;
-                }*/
-            //}
         }
-        ////////////////////////////////////
-        // PERFORM IMAGE PROCESSING ABOVE //
-        ////////////////////////////////////
-
-        //// Convert Mat to QImage: Show grayscale frame [if either Grayscale or Canny processing modes are ON]
-        /*if(bsOn && !colorOn)
-        {
-          //  if(BSNumberOfIterations)
-              //  frame=MatToQImage(currentFrameCopy);
-            //else
-                //frame=MatToQImage(fore);
-        }
-        else if(!bsOn && colorOn)
-            frame=MatToQImage(currentFrameCopybin);
-        else if(bsOn && colorOn)
-        {
-            if(!BSNumberOfIterations)
-            {
-                bitwise_and(fore,currentFrameCopybin,foreandcolor);
-                frame=MatToQImage(foreandcolor);
-            }
-            else
-                frame=MatToQImage(currentFrameCopybin);
-        }
-        else
-            frame=MatToQImage(currentFrameCopy);
-        //// Convert Mat to QImage: Show BGR frame
-*/
         updateMembersMutex.unlock();
-
-        // Update statistics
         updateFPS(processingTime);
         currentSizeOfBuffer=imageBuffer->getSizeOfImageBuffer();
         if(isPos)
@@ -169,7 +277,7 @@ void ProcessingThread::run()
             emit newData(data);
         }
         emit newFrame(frame);
-
+        emit newFrame2(frame1);
     }
     qDebug() << "Stopping processing thread...";
 }
@@ -228,9 +336,7 @@ void ProcessingThread::updateProcessingFlags(struct ProcessingFlags processingFl
     QMutexLocker locker(&updateMembersMutex);
     playOn=processingFlags.playOn;
     bsOn=processingFlags.bsOn;
-    rgbOn=processingFlags.rgbOn;
-    hsvOn=processingFlags.hsvOn;
-    ycrcbOn=processingFlags.ycrcbOn;
+    campOn=processingFlags.campOn;
     teamOn=processingFlags.teamOn;
     robot1On=processingFlags.robot1On;
     robot2On=processingFlags.robot2On;
@@ -241,16 +347,51 @@ void ProcessingThread::updateProcessingSettings(struct ProcessingSettings proces
 {
     QMutexLocker locker(&updateMembersMutex);
 
+    TeamColorType=processingSettings.TeamColorType;
     Teammin=cv::Scalar(processingSettings.TeamChannel1min,processingSettings.TeamChannel2min,processingSettings.TeamChannel3min);
     Teammax=cv::Scalar(processingSettings.TeamChannel1max,processingSettings.TeamChannel2max,processingSettings.TeamChannel3max);
+    Robot1ColorType=processingSettings.Robot1ColorType;
     Robot1min=cv::Scalar(processingSettings.Robot1Channel1min,processingSettings.Robot1Channel2min,processingSettings.Robot1Channel3min);
     Robot1max=cv::Scalar(processingSettings.Robot1Channel1max,processingSettings.Robot1Channel2max,processingSettings.Robot1Channel3max);
+    Robot2ColorType=processingSettings.Robot2ColorType;
     Robot2min=cv::Scalar(processingSettings.Robot2Channel1min,processingSettings.Robot2Channel2min,processingSettings.Robot2Channel3min);
     Robot2max=cv::Scalar(processingSettings.Robot2Channel1max,processingSettings.Robot2Channel2max,processingSettings.Robot2Channel3max);
+    BallColorType=processingSettings.BallColorType;
     Ballmin=cv::Scalar(processingSettings.BallChannel1min,processingSettings.BallChannel2min,processingSettings.BallChannel3min);
     Ballmax=cv::Scalar(processingSettings.BallChannel1max,processingSettings.BallChannel2max,processingSettings.BallChannel3max);
-
     BSNumberOfIterations=processingSettings.BSNumberOfIterations;
+
+    psettings.TeamColorType=processingSettings.TeamColorType;
+    psettings.TeamChannel1min=processingSettings.TeamChannel1min;
+    psettings.TeamChannel1max=processingSettings.TeamChannel1max;
+    psettings.TeamChannel2min=processingSettings.TeamChannel2min;
+    psettings.TeamChannel2max=processingSettings.TeamChannel2max;
+    psettings.TeamChannel3min=processingSettings.TeamChannel3min;
+    psettings.TeamChannel3max=processingSettings.TeamChannel3max;
+
+    psettings.Robot1ColorType=processingSettings.Robot1ColorType;
+    psettings.Robot1Channel1min=processingSettings.Robot1Channel1min;
+    psettings.Robot1Channel1max=processingSettings.Robot1Channel1max;
+    psettings.Robot1Channel2min=processingSettings.Robot1Channel2min;
+    psettings.Robot1Channel2max=processingSettings.Robot1Channel2max;
+    psettings.Robot1Channel3min=processingSettings.Robot1Channel3min;
+    psettings.Robot1Channel3max=processingSettings.Robot1Channel3max;
+
+    psettings.Robot2ColorType=processingSettings.Robot2ColorType;
+    psettings.Robot2Channel1min=processingSettings.Robot2Channel1min;
+    psettings.Robot2Channel1max=processingSettings.Robot2Channel1max;
+    psettings.Robot2Channel2min=processingSettings.Robot2Channel2min;
+    psettings.Robot2Channel2max=processingSettings.Robot2Channel2max;
+    psettings.Robot2Channel3min=processingSettings.Robot2Channel3min;
+    psettings.Robot2Channel3max=processingSettings.Robot2Channel3max;
+
+    psettings.BallColorType=processingSettings.BallColorType;
+    psettings.BallChannel1min=processingSettings.BallChannel1min;
+    psettings.BallChannel1max=processingSettings.BallChannel1max;
+    psettings.BallChannel2min=processingSettings.BallChannel2min;
+    psettings.BallChannel2max=processingSettings.BallChannel2max;
+    psettings.BallChannel3min=processingSettings.BallChannel3min;
+    psettings.BallChannel3max=processingSettings.BallChannel3max;
 } // updateProcessingSettings()
 
 void ProcessingThread::updatePosData(struct PosData posData)

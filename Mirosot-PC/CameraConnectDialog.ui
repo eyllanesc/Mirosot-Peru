@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>410</width>
-    <height>221</height>
+    <width>385</width>
+    <height>220</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,18 +21,43 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>410</width>
-    <height>170</height>
+    <width>385</width>
+    <height>220</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>385</width>
+    <height>220</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="focusPolicy">
    <enum>Qt::NoFocus</enum>
   </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::NoContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>Connect to Camera</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="MyResource.qrc">
+    <normaloff>:/images/logo.png</normaloff>:/images/logo.png</iconset>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
   <property name="modal">
-   <bool>false</bool>
+   <bool>true</bool>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -195,7 +220,9 @@
   <tabstop>deviceNumberEdit</tabstop>
   <tabstop>okCancelBox</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="MyResource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>okCancelBox</sender>

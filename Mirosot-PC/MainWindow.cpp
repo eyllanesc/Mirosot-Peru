@@ -15,13 +15,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->setupUi(this);
     isPlay=false;
     ui->ledIndicator_1->setDisabled(true);
-    //ui->on_off->setText("Play");
-    playCtl = new QPushButton(this);
-    playCtl->setIcon(QIcon(QPixmap("/home/edwin/Documents/MS/images/connect.png")));
-    playCtl->setIconSize(QSize(25, 25));
-    playCtl->setStyleSheet("QPushButton{border: none;outline: none;}");
-    playCtl->move(1000,600);
-    playCtl->setDisabled(true);
+    //ui->on_off->setText("Play");;
+    //ui->playbutton->setIcon(QIcon(QPixmap("/home/edwin/Documents/MS/images/connect.png")));
+    //ui->playbutton->setIconSize(QSize(25, 25));
+    //ui->playbutton->setStyleSheet("QPushButton{border: none;outline: none;}");
+    //ui->playbutton->move(1080,500);
+    ui->playbutton->setDisabled(true);
+    ui->actionOther_Team->setDisabled(true);
     //leds.append(new QLedIndicator(this));
     //QPalette Pal(palette());
     // Asignar el color de fondo como Negro
@@ -47,10 +47,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     signalSlotsInit();
 
-    rgbOn=false;
-    hsvOn=false;
-    ycrcbOn=false;
-
+    campOn=false;
     teamOn=false;
     robot1On=false;
     robot2On=false;
@@ -63,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     settingsDialog = new SettingsDialog(this);
     cameraConnectDialog = new CameraConnectDialog(this);
+
+    histogram=new Histogram();
 } // MainWindow constructor
 
 MainWindow::~MainWindow()
@@ -72,6 +71,7 @@ MainWindow::~MainWindow()
     {
         // Disconnect connections (4)
         disconnect(controller->processingThread,SIGNAL(newFrame(QImage)),0,0);
+        disconnect(controller->processingThread,SIGNAL(newFrame2(QImage)),0,0);
         disconnect(this,SIGNAL(newProcessingFlags(struct ProcessingFlags)),controller->processingThread,SLOT(updateProcessingFlags(struct ProcessingFlags)));
         disconnect(this->processingSettingsDialog,SIGNAL(newProcessingSettings(struct ProcessingSettings)),controller->processingThread,SLOT(updateProcessingSettings(struct ProcessingSettings)));
         disconnect(this,SIGNAL(newTaskData(struct TaskData)),controller->processingThread,SLOT(updateTaskData(struct TaskData)));
@@ -149,19 +149,22 @@ void MainWindow::connectToStart()
             isCameraConnected=controller->connectToCamera(deviceNumber,imageBufferSize);
         if(isPortConnected && isCameraConnected)
         {
-            playCtl->setDisabled(false);
-            connect(playCtl,SIGNAL(clicked()),this,SLOT(play()));
+            ui->playbutton->setDisabled(false);
+            connect(ui->playbutton,SIGNAL(clicked()),this,SLOT(play()));
             connect(controller->sendThread->serial, SIGNAL(readyRead()), this,SLOT(readData()),Qt::UniqueConnection);
             connect(controller->processingThread,SIGNAL(newData(QString)),this,SLOT(updateData(QString)),Qt::UniqueConnection);
             connect(controller->processingThread,SIGNAL(newFrame(QImage)),this,SLOT(updateFrame(QImage)),Qt::UniqueConnection);
+            connect(controller->processingThread,SIGNAL(newFrame2(QImage)),this,SLOT(updateFrame2(QImage)),Qt::UniqueConnection);
             qRegisterMetaType<struct ProcessingFlags>("ProcessingFlags");
             connect(this,SIGNAL(newProcessingFlags(struct ProcessingFlags)),controller->processingThread,SLOT(updateProcessingFlags(struct ProcessingFlags)),Qt::UniqueConnection);
             qRegisterMetaType<struct ProcessingSettings>("ProcessingSettings");
             connect(this->processingSettingsDialog,SIGNAL(newProcessingSettings(struct ProcessingSettings)),controller->processingThread,SLOT(updateProcessingSettings(struct ProcessingSettings)),Qt::UniqueConnection);
+            connect(controller->processingThread,SIGNAL(newProcessingSettings(struct ProcessingSettings)),this->processingSettingsDialog,SLOT(updateProcessingSettings(struct ProcessingSettings)));
             qRegisterMetaType<struct TaskData>("TaskData");
             connect(this,SIGNAL(newTaskData(struct TaskData)),controller->processingThread,SLOT(updateTaskData(struct TaskData)),Qt::UniqueConnection);
             qRegisterMetaType<struct PosData>("PosData");
             connect(this,SIGNAL(newPosData(struct PosData)),controller->processingThread,SLOT(updatePosData(PosData)),Qt::UniqueConnection);
+            connect(controller->processingThread,SIGNAL(newHistogram(QImage)),this,SLOT(setHistogram(QImage)));
             // Set data to defaults in processingThread
             emit newProcessingFlags(processingFlags);
             emit newTaskData(taskData);
@@ -224,6 +227,7 @@ void MainWindow::connectToStart()
                 ui->StartAction->setIcon(QIcon(":/images/connect.png"));
                 ui->StartAction->setText("Connect");
                 disconnect(controller->processingThread,SIGNAL(newFrame(QImage)),0,0);
+                disconnect(controller->processingThread,SIGNAL(newFrame2(QImage)),0,0);
                 disconnect(this,SIGNAL(newProcessingFlags(struct ProcessingFlags)),controller->processingThread,SLOT(updateProcessingFlags(struct ProcessingFlags)));
                 disconnect(this->processingSettingsDialog,SIGNAL(newProcessingSettings(struct ProcessingSettings)),controller->processingThread,SLOT(updateProcessingSettings(struct ProcessingSettings)));
                 disconnect(this,SIGNAL(newTaskData(struct TaskData)),controller->processingThread,SLOT(updateTaskData(struct TaskData)));
@@ -310,12 +314,27 @@ void MainWindow::setBS(bool input)
 {
     // Not checked
     if(!input)
+    {
         processingFlags.bsOn=false;
+        ui->actionTeam->setDisabled(false);
+        ui->actionRobot1->setDisabled(false);
+        ui->actionRobot2->setDisabled(false);
+        ui->actionBall->setDisabled(false);
+        ui->actionCamp->setDisabled(false);
+    }
     // Checked
     else if(input)
+    {
         processingFlags.bsOn=true;
+        ui->actionTeam->setDisabled(true);
+        ui->actionRobot1->setDisabled(true);
+        ui->actionRobot2->setDisabled(true);
+        ui->actionBall->setDisabled(true);
+        ui->actionCamp->setDisabled(true);
+    }
     // Update processing flags in processingThread
     emit newProcessingFlags(processingFlags);
+
 }// setBS()
 
 void MainWindow::updateFrame(const QImage &frame)
@@ -338,9 +357,12 @@ void MainWindow::updateFrame(const QImage &frame)
                           QString("x")+QString::number(controller->processingThread->getCurrentROI().height));
     // Display frame in main window
     ui->frameLabel->setPixmap(QPixmap::fromImage(frame));
-    ui->frameLabel_2->setPixmap(QPixmap::fromImage(frame));
 } // updateFrame()
 
+void MainWindow::updateFrame2(const QImage &frame)
+{
+    ui->frameLabel_2->setPixmap(QPixmap::fromImage(frame));
+}
 void MainWindow::setProcessingSettings()
 {
     // Prompt user:
@@ -433,9 +455,7 @@ void MainWindow::initializeProcessingFlagsStructure()
 {
     processingFlags.bsOn=false;
     processingFlags.playOn=false;
-    processingFlags.rgbOn=false;
-    processingFlags.hsvOn=false;
-    processingFlags.ycrcbOn=false;
+    processingFlags.campOn=false;
     processingFlags.teamOn=false;
     processingFlags.robot1On=false;
     processingFlags.robot2On=false;
@@ -490,15 +510,11 @@ void MainWindow::signalSlotsInit()
     connect(ui->aboutAction, SIGNAL(triggered()), this, SLOT(about()));
     connect(ui->clearImageBufferButton, SIGNAL(released()), this, SLOT(clearImageBuffer()));
     connect(ui->frameLabel, SIGNAL(onMouseMoveEvent()), this, SLOT(updateMouseCursorPosLabel()));
-
-    connect(ui->actionRGB,SIGNAL(toggled(bool)),this,SLOT(setColorRGB(bool)));
-    connect(ui->actionHSV,SIGNAL(toggled(bool)),this,SLOT(setColorHSV(bool)));
-    connect(ui->actionYCrCb,SIGNAL(toggled(bool)),this,SLOT(setColorYCrCb(bool)));
-
-    connect(ui->actionTeam,SIGNAL(toggled(bool)),this,SLOT(setTeam(bool)));
-    connect(ui->actionRobot1,SIGNAL(toggled(bool)),this,SLOT(setRobot1(bool)));
-    connect(ui->actionRobot2,SIGNAL(toggled(bool)),this,SLOT(setRobot2(bool)));
-    connect(ui->actionBall,SIGNAL(toggled(bool)),this,SLOT(setBall(bool)));
+    connect(ui->actionCamp,SIGNAL(changed()),this,SLOT(setCamp()));
+    connect(ui->actionTeam,SIGNAL(changed()),this,SLOT(setTeam()));
+    connect(ui->actionRobot1,SIGNAL(changed()),this,SLOT(setRobot1()));
+    connect(ui->actionRobot2,SIGNAL(changed()),this,SLOT(setRobot2()));
+    connect(ui->actionBall,SIGNAL(changed()),this,SLOT(setBall()));
     // Create connection between frameLabel (emitter) and GUI thread (receiver/listener)
     qRegisterMetaType<struct MouseData>("MouseData");
     connect(ui->frameLabel,SIGNAL(newMouseData(struct MouseData)),this,SLOT(newMouseData(struct MouseData)));
@@ -506,115 +522,80 @@ void MainWindow::signalSlotsInit()
 
 } // signalSlotsInit()
 
-void MainWindow::setColorRGB(bool input)
+void MainWindow::setTeam()
 {
-    if(!input)
-        rgbOn=false;
-    else if(input)
+    if(!ui->actionTeam->isChecked())
     {
-        rgbOn=true;
-        setColorModel(1);
-    }
-}
-
-void MainWindow::setColorHSV(bool input)
-{
-    if(!input)
-        hsvOn=false;
-    else if(input)
-    {
-        hsvOn=true;
-        setColorModel(2);
-    }
-}
-
-void MainWindow::setColorYCrCb(bool input)
-{
-    if(!input)
-        ycrcbOn=false;
-    else if(input)
-    {
-        ycrcbOn=true;
-        setColorModel(3);
-    }
-}
-
-void MainWindow::setColorModel(int type)
-{
-    if(type==1)
-    {
-        ui->actionHSV->setChecked(false);
-        hsvOn=false;
-        ui->actionYCrCb->setChecked(false);
-        ycrcbOn=false;
-    }
-    else if(type==2)
-    {
-        ui->actionRGB->setChecked(false);
-        rgbOn=false;
-        ui->actionYCrCb->setChecked(false);
-        ycrcbOn=false;
-    }
-    else if(type==3)
-    {
-        ui->actionRGB->setChecked(false);
-        rgbOn=false;
-        ui->actionHSV->setChecked(false);
-    }
-    processingFlags.rgbOn=rgbOn;
-    processingFlags.hsvOn=hsvOn;
-    processingFlags.ycrcbOn=ycrcbOn;
-    emit newProcessingFlags(processingFlags);
-}
-
-void MainWindow::setTeam(bool input)
-{
-    if(!input)
         teamOn=false;
-    else if(input)
+        setObject(0);
+    }
+    else
     {
         teamOn=true;
         setObject(1);
     }
 }
 
-void MainWindow::setRobot1(bool input)
+void MainWindow::setRobot1()
 {
-    if(!input)
+    if(!ui->actionRobot1->isChecked())
+    {
         robot1On=false;
-    else if(input)
+        setObject(0);
+    }
+    else
     {
         robot1On=true;
         setObject(2);
     }
 }
 
-void MainWindow::setRobot2(bool input)
+void MainWindow::setRobot2()
 {
-    if(!input)
+    if(!ui->actionRobot2->isChecked())
+    {
         robot2On=false;
-    else if(input)
+        setObject(0);
+    }
+    else
     {
         robot2On =true;
         setObject(3);
     }
 }
 
-void MainWindow::setBall(bool input)
+void MainWindow::setBall()
 {
-    if(!input)
+    if(!ui->actionBall->isChecked())
+    {
         ballOn=false;
-    else if(input)
+        setObject(0);
+    }
+    else
     {
         ballOn =true;
         setObject(4);
     }
 }
 
+void MainWindow::setCamp()
+{
+    if(!ui->actionCamp->isChecked())
+    {
+        campOn=false;
+        setObject(0);
+    }
+    else
+    {
+        campOn =true;
+        setObject(5);
+    }
+}
 void MainWindow::setObject(int type)
 {
     if(!isPlay)
     {
+        ui->BSAction->setDisabled(true);
         if(type==1)
         {
             ui->actionRobot1->setChecked(false);
@@ -623,6 +604,8 @@ void MainWindow::setObject(int type)
             robot2On=false;
             ui->actionBall->setChecked(false);
             ballOn=false;
+            ui->actionCamp->setChecked(false);
+            campOn=false;
         }
         else if(type==2)
         {
@@ -632,6 +615,8 @@ void MainWindow::setObject(int type)
             robot2On=false;
             ui->actionBall->setChecked(false);
             ballOn=false;
+            ui->actionCamp->setChecked(false);
+            campOn=false;
         }
         else if(type==3)
         {
@@ -641,6 +626,8 @@ void MainWindow::setObject(int type)
             robot1On=false;
             ui->actionBall->setChecked(false);
             ballOn=false;
+            ui->actionCamp->setChecked(false);
+            campOn=false;
         }
         else if(type==4)
         {
@@ -650,8 +637,26 @@ void MainWindow::setObject(int type)
             robot1On=false;
             ui->actionRobot2->setChecked(false);
             robot2On=false;
+            ui->actionCamp->setChecked(false);
+            campOn=false;
+        }
+        else if(type==5)
+        {
+            ui->actionTeam->setChecked(false);
+            teamOn=false;
+            ui->actionRobot1->setChecked(false);
+            robot1On=false;
+            ui->actionRobot2->setChecked(false);
+            robot2On=false;
+            ui->actionBall->setChecked(false);
+            ballOn=false;
+        }
+        else
+        {
+            ui->BSAction->setDisabled(false);
         }
     }
+    processingFlags.campOn=campOn;
     processingFlags.teamOn=teamOn;
     processingFlags.robot1On=robot1On;
     processingFlags.robot2On=robot2On;
@@ -672,10 +677,33 @@ void MainWindow::play()
         processingFlags.robot1On=false;
         processingFlags.robot2On=false;
         processingFlags.ballOn=false;
+        processingFlags.playOn=false;
+        ui->menuCalibration->setDisabled(false);
+        ui->actionOther_Team->setDisabled(true);
     }
     else if(!isPlay)
     {
         isPlay=true;
+        processingFlags.playOn=true;
+        ui->menuCalibration->setDisabled(true);
+        ui->actionOther_Team->setDisabled(false);
     }
     emit newProcessingFlags(processingFlags);
+}
+
+void MainWindow::setHistogram(const QImage &hist)
+{
+
+    if(ui->checkBox->isChecked())
+    {
+        histogram->setImage(hist);
+        if(histogram->exec()==1)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
 }

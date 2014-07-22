@@ -16,7 +16,8 @@ VERSION = 1.00
 DEFINES += APP_VERSION=$$VERSION
 
 FORMS = CameraConnectDialog.ui MainWindow.ui ProcessingSettingsDialog.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    histogram.ui
 
 SOURCES += main.cpp\
     MainWindow.cpp \
@@ -30,7 +31,8 @@ SOURCES += main.cpp\
     MatToQImage.cpp \
     settingsdialog.cpp \
     SendThread.cpp \
-    qledindicator.cpp
+    qledindicator.cpp \
+    histogram.cpp
 
 HEADERS  += MainWindow.h \
     CaptureThread.h \
@@ -45,12 +47,13 @@ HEADERS  += MainWindow.h \
     MatToQImage.h \
     settingsdialog.h \
     SendThread.h \
-    qledindicator.h
+    qledindicator.h \
+    histogram.h
 
 unix: CONFIG += link_pkgconfig \
     serialport
 unix: PKGCONFIG += opencv \
-#    cvblob
+    cvblob
 
 OTHER_FILES += \
     README.md

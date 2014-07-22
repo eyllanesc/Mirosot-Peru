@@ -18,7 +18,7 @@ class MainWindow;
 #include "settingsdialog.h"
 #include "Controller.h"
 #include "Config.h"
-
+#include "histogram.h"
 // Qt header files
 #include <QDebug>
 #include <QPushButton>
@@ -30,6 +30,7 @@ class CameraConnectDialog;
 class ProcessingSettingsDialog;
 class Controller;
 class SettingsDialog;
+class Histogram;
 
 class MainWindow : public QMainWindow
 {
@@ -49,13 +50,15 @@ private:
     ProcessingSettingsDialog *processingSettingsDialog;
     SettingsDialog *settingsDialog;
     Controller *controller;
+    Histogram *histogram;
+
     ProcessingFlags processingFlags;
     TaskData taskData;
     PosData posData;
     QString appVersion;
     int sourceWidth;
     int sourceHeight;
-    QPushButton *playCtl;
+    //QPushButton *playCtl;
     int deviceNumber;
     int imageBufferSize;
     Settings settings;
@@ -65,10 +68,7 @@ private:
     bool isCamera;
     bool isSerial;
 
-    bool rgbOn;
-    bool hsvOn;
-    bool ycrcbOn;
-
+    bool campOn;
     bool teamOn;
     bool robot1On;
     bool robot2On;
@@ -84,23 +84,24 @@ public slots:
     void connectToSerial();
     void about();
     void clearImageBuffer();
-    void setBS(bool);
     void setProcessingSettings();
     void updateMouseCursorPosLabel();
     void newMouseData(struct MouseData);
+    void setHistogram(const QImage &hist);
+
 private slots:
     void updateFrame(const QImage &frame);
+    void updateFrame2(const QImage &frame);
     void updateData(const QString data);
     void readData();
 
-    void setTeam(bool);
-    void setRobot1(bool);
-    void setRobot2(bool);
-    void setBall(bool);
+    void setBS(bool);
+    void setCamp();
+    void setTeam();
+    void setRobot1();
+    void setRobot2();
+    void setBall();
 
-    void setColorRGB(bool);
-    void setColorHSV(bool);
-    void setColorYCrCb(bool);
 signals:
     void newProcessingFlags(struct ProcessingFlags p_flags);
     void newTaskData(struct TaskData taskData);

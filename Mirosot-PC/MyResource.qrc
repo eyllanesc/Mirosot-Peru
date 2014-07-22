@@ -7,5 +7,6 @@
         <file>images/system-help.png</file>
         <file>images/serial.jpg</file>
         <file>images/Qt-logo.png</file>
+        <file>images/logo.png</file>
     </qresource>
 </RCC>

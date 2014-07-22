@@ -120,7 +120,10 @@ void FrameLabel::paintEvent(QPaintEvent *ev)
     // Draw box
     if(drawBox)
     {
-        painter.setPen(Qt::blue);
+        painter.setPen(Qt::green);
         painter.drawRect(*box);
+        painter.setPen(QPen(Qt::black,2));
+        painter.setFont(QFont("Helvetica", 11));
+        painter.drawLine(initial,getMouseCursorPos());
     }
 } // paintEvent()

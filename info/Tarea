@@ -3,3 +3,5 @@
 - parches de colores.
 - seguidor de linea programada para un camino cuadrado.
 - Algoritmo de decodificacion: I(0-1)X(numero)Y(numero)Z(angulo)A(numero)B(numero)C(angulo);
+- Tablero de ajedrez para calibrar las medidas.
+- implementar un tipo de comunicación.

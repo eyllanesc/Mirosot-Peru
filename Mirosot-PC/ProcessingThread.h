@@ -48,6 +48,11 @@ private:
     cv::Rect originalROI;
     cv::Rect currentROI;
 
+    cv::Mat team;
+    cv::Mat teambin;
+    cv::Mat Robot1;
+    cv::Mat Robot1bin;
+
     cv::Rect campROI;
 
     cv::Scalar meantmp;

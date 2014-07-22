@@ -199,10 +199,35 @@ void ProcessingThread::run()
         {
             currentFrameCopy.locateROI(frameSize,framePoint);
             currentFrameCopy.adjustROI(-campROI.y,-(frameSize.height-campROI.height-campROI.y),-campROI.x,-(frameSize.width-campROI.width-campROI.x));
-            if(playOn)
+            if(playOn)//Play
             {
+                bg.operator()(currentFrameCopy,fore,0);
+
+                //Obtencion de Team
+                if(TeamColorType==0)
+                    currentFrameCopy.copyTo(team);
+                else if(TeamColorType==1)
+                    cv::cvtColor(currentFrameCopy,team,cv::COLOR_RGB2HSV);
+                else if(TeamColorType==2)
+                    cv::cvtColor(currentFrameCopy,team,cv::COLOR_RGB2YCrCb);
+
+                cv::inRange(team,Teammin,Teammax,teambin);
+                cv::bitwise_and(teambin,fore,teambin);
+
+                //Obtencion de Robot1
+                if(TeamColorType==0)
+                    currentFrameCopy.copyTo(Robot1);
+                else if(TeamColorType==1)
+                    cv::cvtColor(currentFrameCopy,Robot1,cv::COLOR_RGB2HSV);
+                else if(TeamColorType==2)
+                    cv::cvtColor(currentFrameCopy,Robot1,cv::COLOR_RGB2YCrCb);
+
+                cv::inRange(Robot1,Robot1min,Robot1max,Robot1bin);
+                cv::bitwise_and(Robot1bin,fore,Robot1bin);
+
+                cv::bitwise_or(teambin,Robot1bin,currentFrameCopybin);
                 frame=MatToQImage(currentFrameCopy);
-                frame1=MatToQImage(fore);
+                frame1=MatToQImage(currentFrameCopybin);
             }
             else
             {//Background Subtraction

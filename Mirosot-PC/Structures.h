@@ -16,6 +16,13 @@ struct ProcessingSettings{
     int Robot1ColorType;
     int Robot2ColorType;
     int BallColorType;
+    int SmoothType;
+    int SmoothSize;
+    int DilateType;
+    int DilateSize;
+    int ErodeType;
+    int FlipType;
+    int ErodeSize;
 
     int TeamChannel1min;
     int TeamChannel1max;
@@ -24,12 +31,18 @@ struct ProcessingSettings{
     int TeamChannel3min;
     int TeamChannel3max;
 
+    int TeamAreamin;
+    int TeamAreamax;
+
     int Robot1Channel1min;
     int Robot1Channel1max;
     int Robot1Channel2min;
     int Robot1Channel2max;
     int Robot1Channel3min;
     int Robot1Channel3max;
+
+    int Robot1Areamin;
+    int Robot1Areamax;
 
     int Robot2Channel1min;
     int Robot2Channel1max;
@@ -38,6 +51,9 @@ struct ProcessingSettings{
     int Robot2Channel3min;
     int Robot2Channel3max;
 
+    int Robot2Areamin;
+    int Robot2Areamax;
+
     int BallChannel1min;
     int BallChannel1max;
     int BallChannel2min;
@@ -45,7 +61,8 @@ struct ProcessingSettings{
     int BallChannel3min;
     int BallChannel3max;
 
-    int BSNumberOfIterations;
+    int BallAreamin;
+    int BallAreamax;
 };
 
 // ProcessingFlags structure definition

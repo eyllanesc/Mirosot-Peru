@@ -52,6 +52,8 @@ private:
     Controller *controller;
     Histogram *histogram;
 
+    int cont;
+
     ProcessingFlags processingFlags;
     TaskData taskData;
     PosData posData;
@@ -88,11 +90,13 @@ public slots:
     void updateMouseCursorPosLabel();
     void newMouseData(struct MouseData);
     void setHistogram(const QImage &hist);
+    void asinwrite();
 
 private slots:
     void updateFrame(const QImage &frame);
     void updateFrame2(const QImage &frame);
     void updateData(const QString data);
+    void updateCalibrar(const QString state);
     void readData();
 
     void setBS(bool);

@@ -23,6 +23,16 @@ ProcessingThread::ProcessingThread(ImageBuffer *imageBuffer, int inputSourceWidt
     Robot2ColorType=0;
     BallColorType=0;
     playOn=false;
+
+    SmoothType=0;
+    SmoothSize=1;
+    FlipType=NFLIP;
+    ErodeType=cv::MORPH_RECT;
+    ErodeSize=cv::MORPH_RECT;
+    DilateType=1;
+    DilateSize=1;
+
+    BSNumberOfIterations=DEFAULT_BS_ITERATIONS;
     // Initialize currentROI variable
     currentROI=cv::Rect(0,0,inputSourceWidth,inputSourceHeight);
     campROI=currentROI;
@@ -33,19 +43,30 @@ ProcessingThread::ProcessingThread(ImageBuffer *imageBuffer, int inputSourceWidt
     initial.y=-10;
     final.x=-10;
     final.y=-10;
+    setDilate(DilateType,DilateSize);
+    setErode(ErodeType,ErodeSize);
 } // ProcessingThread constructor
 
 ProcessingThread::~ProcessingThread()
 {
 } // ProcessingThread destructor
 
+void ProcessingThread::setDilate(int type, int size)
+{
+    elementDilate = cv::getStructuringElement(type,cv::Size( 2*size + 1, 2*size+1 ),cv::Point(size, size));
+}
+
+void ProcessingThread::setErode(int type, int size)
+{
+    elementErode = cv::getStructuringElement(type,cv::Size( 2*size + 1, 2*size+1 ),cv::Point(size, size));
+}
+
 void ProcessingThread::run()
 {
     cv::BackgroundSubtractorMOG2 bg;
-    bg.set("nmixtures",5);
-    bg.set("detectShadows",false);
-    cv::Mat HSVcurrentFrame;
-    cv::Mat YCrCbcurrentFrame;
+    bg.set("nmixtures",7);
+    bg.set("detectShadows",true);
+
     cv::Mat fore;
     std::vector<cv::Mat> bgr_planes;
     int histSize = 256;
@@ -55,6 +76,7 @@ void ProcessingThread::run()
     int bin_w;
     int hist_w = 256; int hist_h = 400;
     float angle=0;
+    std::vector<std::vector<cv::Point> > contours;
     while(true)
     {
         /////////////////////////////////
@@ -77,8 +99,31 @@ void ProcessingThread::run()
         // Get frame from queue
         cv::Mat currentFrame=imageBuffer->getFrame();
         // Make copy of current frame (processing will be performed on this copy)
-        currentFrame.copyTo(currentFrameCopy);
         currentFrame.copyTo(currentFrameCopy2);
+        //cv::flip(currentFrameCopy2,currentFrameCopy2,-1);
+        if(SmoothType==0)
+        {
+            cv::blur(currentFrameCopy2, currentFrameCopy, cv::Size( 2*SmoothSize+1, 2*SmoothSize+1), cv::Point(-1,-1));
+        }
+        else if(SmoothType==1)
+        {
+            cv::GaussianBlur( currentFrameCopy2, currentFrameCopy, cv::Size( 2*SmoothSize+1, 2*SmoothSize+1 ), 0, 0 );
+        }
+        else if(SmoothType==2)
+        {
+            cv::medianBlur(currentFrameCopy2, currentFrameCopy, 2*SmoothSize+1 );
+        }
+        else if(SmoothType==3)
+        {
+            cv::bilateralFilter (currentFrameCopy2, currentFrameCopy, 2*SmoothSize+1, (2*SmoothSize+1)*2, (2*SmoothSize+1)/2 );;
+        }
+        else
+        {
+            currentFrameCopy2.copyTo(currentFrameCopy);
+        }
+
+        if(FlipType!=NFLIP)
+            cv::flip(currentFrameCopy,currentFrameCopy,FlipType);
         //line(currentFrameCopy, initial, final, CV_RGB(255, 255, 0), 2, CV_AA);
         //circle(currentFrameCopy , initial, 3, CV_RGB(255, 0, 255), 2, CV_AA);
         //circle(currentFrameCopy , final, 3, CV_RGB(0, 255, 255), 2, CV_AA);
@@ -201,8 +246,9 @@ void ProcessingThread::run()
             currentFrameCopy.adjustROI(-campROI.y,-(frameSize.height-campROI.height-campROI.y),-campROI.x,-(frameSize.width-campROI.width-campROI.x));
             if(playOn)//Play
             {
+                //BS
                 bg.operator()(currentFrameCopy,fore,0);
-
+                fore=255*(fore==255);
                 //Obtencion de Team
                 if(TeamColorType==0)
                     currentFrameCopy.copyTo(team);
@@ -212,20 +258,91 @@ void ProcessingThread::run()
                     cv::cvtColor(currentFrameCopy,team,cv::COLOR_RGB2YCrCb);
 
                 cv::inRange(team,Teammin,Teammax,teambin);
-                cv::bitwise_and(teambin,fore,teambin);
+                //cv::bitwise_and(fore,teambin,teambin);
+                cv::erode(teambin,teambin,elementErode);
+                cv::dilate(teambin,teambin,elementDilate);
+                cv::findContours(teambin,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                std::vector<cv::RotatedRect> minRectTeam( contours.size() );
+                for(unsigned int i = 0; i < contours.size(); i++ )
+                    minRectTeam[i] = cv::minAreaRect(cv::Mat(contours[i]));
+                for(unsigned int i = 0; i< contours.size(); i++ )
+                {
+                    cv::Point2f rect_points[4];
+                    minRectTeam[i].points(rect_points);
+                    for( int j = 0; j < 4; j++ )
+                        cv::line( currentFrameCopy, rect_points[j], rect_points[(j+1)%4], cv::Scalar(255,0,255), 1,CV_AA);
+                }
 
                 //Obtencion de Robot1
-                if(TeamColorType==0)
+                if(Robot1ColorType==0)
                     currentFrameCopy.copyTo(Robot1);
-                else if(TeamColorType==1)
+                else if(Robot1ColorType==1)
                     cv::cvtColor(currentFrameCopy,Robot1,cv::COLOR_RGB2HSV);
-                else if(TeamColorType==2)
+                else if(Robot1ColorType==2)
                     cv::cvtColor(currentFrameCopy,Robot1,cv::COLOR_RGB2YCrCb);
-
                 cv::inRange(Robot1,Robot1min,Robot1max,Robot1bin);
-                cv::bitwise_and(Robot1bin,fore,Robot1bin);
+                //cv::bitwise_and(fore,Robot1bin,Robot1bin);
+                cv::erode(Robot1bin,Robot1bin,elementErode);
+                cv::dilate(Robot1bin,Robot1bin,elementDilate);
+                cv::findContours(Robot1bin,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_TC89_L1);
 
+                std::vector<cv::Moments> mu1(contours.size());
+                std::vector<cv::Point2f> mc1( contours.size());
+
+                for(unsigned int i = 0; i < contours.size(); i++ )
+                    mu1[i] = moments( contours[i], false );
+
+                for(unsigned int i = 0; i < contours.size(); i++ )
+                    mc1[i]=cv::Point2f( mu1[i].m10/mu1[i].m00 , mu1[i].m01/mu1[i].m00 );
+
+                std::vector<cv::RotatedRect> minRectRobot1( contours.size());
+                for(unsigned int i = 0; i < contours.size(); i++ )
+                    minRectRobot1[i] = cv::minAreaRect(cv::Mat(contours[i]));
+                for(unsigned int i = 0; i< contours.size(); i++ )
+                {
+                    cv::Point2f rect_points[4];
+                    minRectRobot1[i].points(rect_points);
+                    for( int j = 0; j < 4; j++ )
+                        cv::line( currentFrameCopy, rect_points[j], rect_points[(j+1)%4], cv::Scalar(0,0,255), 1,CV_AA);
+                }
+                if(!mc1.empty())
+                    cv::putText(currentFrameCopy, "Robot1", mc1[0], CV_FONT_HERSHEY_PLAIN, 0.6,cv::Scalar(255, 0, 0), 1, 2 );
+
+                //Obtencion de Robot2
+                if(Robot2ColorType==0)
+                    currentFrameCopy.copyTo(Robot2);
+                else if(Robot2ColorType==1)
+                    cv::cvtColor(currentFrameCopy,Robot2,cv::COLOR_RGB2HSV);
+                else if(Robot1ColorType==2)
+                    cv::cvtColor(currentFrameCopy,Robot2,cv::COLOR_RGB2YCrCb);
+                cv::inRange(Robot2,Robot2min,Robot2max,Robot2bin);
+                //cv::bitwise_and(fore,Robot1bin,Robot1bin);
+                cv::erode(Robot2bin,Robot2bin,elementErode);
+                cv::dilate(Robot2bin,Robot2bin,elementDilate);
+                cv::findContours(Robot2bin,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                std::vector<cv::RotatedRect> minRectRobot2( contours.size());
+                for(unsigned int i = 0; i < contours.size(); i++ )
+                    minRectRobot2[i] = cv::minAreaRect(cv::Mat(contours[i]));
+                std::vector<cv::Moments> mu2(contours.size());
+                std::vector<cv::Point2f> mc2( contours.size());
+
+                for(unsigned int i = 0; i < contours.size(); i++ )
+                    mu2[i] = moments( contours[i], false );
+
+                for(unsigned int i = 0; i < contours.size(); i++ )
+                    mc2[i]=cv::Point2f( mu2[i].m10/mu2[i].m00 , mu2[i].m01/mu2[i].m00 );
+
+                for(unsigned int i = 0; i< contours.size(); i++ )
+                {
+                    cv::Point2f rect_points[4];
+                    minRectRobot2[i].points(rect_points);
+                    for( int j = 0; j < 4; j++ )
+                        cv::line( currentFrameCopy, rect_points[j], rect_points[(j+1)%4], cv::Scalar(0,255,255), 1,CV_AA);
+                }
+                if(!mc2.empty())
+                    cv::putText(currentFrameCopy, "Robot2", mc2[0], CV_FONT_HERSHEY_PLAIN, 0.6,cv::Scalar(255, 0, 0), 1, 2 );
                 cv::bitwise_or(teambin,Robot1bin,currentFrameCopybin);
+                cv::bitwise_or(Robot2bin,currentFrameCopybin,currentFrameCopybin);
                 frame=MatToQImage(currentFrameCopy);
                 frame1=MatToQImage(currentFrameCopybin);
             }
@@ -233,24 +350,39 @@ void ProcessingThread::run()
             {//Background Subtraction
                 if(bsOn)
                 {
-                    cv::cvtColor(currentFrame,HSVcurrentFrame,cv::COLOR_RGB2HSV);
-                    cv::cvtColor(currentFrame,YCrCbcurrentFrame,cv::COLOR_RGB2YCrCb);
                     if(BSNumberOfIterations && !(teamOn||robot1On||robot2On||ballOn))
                     {
                         bg.operator ()(currentFrameCopy,fore);
                         BSNumberOfIterations--;
-                        qDebug()<<"calibrando";
+                        if(BSNumberOfIterations%12<3)
+                            newCalibration("Calibrating.. : "+QString::number(BSNumberOfIterations));
+                        else if(BSNumberOfIterations%12>7)
+                            newCalibration("Calibrating...: "+QString::number(BSNumberOfIterations));
+                        else
+                            newCalibration("Calibrating.  : "+QString::number(BSNumberOfIterations));
                     }
                     else
                     {
                         bg.operator()(currentFrameCopy,fore,0);
-                        BSNumberOfIterations=0;
-                        qDebug()<<"calibrado";
+                        //BSNumberOfIterations=0;
+                        newCalibration("Calibrate!");
+                        fore=255*(fore==255);
                     }
+                    //foreout= cv::Mat::zeros(currentFrameCopy.size(), CV_8UC1 );
+                    /*cv::findContours(fore,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                    for(unsigned int i=0;i<contours.size();i++){
+                        //Ignore all small insignificant areas
+                        if(cv::contourArea(contours[i])>=BSAreamin*BSAreamin && cv::contourArea(contours[i])<=BSAreamax*BSAreamax){
+                            std::vector<std::vector<cv::Point> > tcontours;
+                            tcontours.push_back(contours[i]);
+                            cv::drawContours(foreout,tcontours,-1,255,CV_FILLED);
+                        }
+                    }*/
                     frame1=MatToQImage(fore);
                 }
                 else if(teamOn||robot1On||robot2On||ballOn)
                 {
+                    currentFrameCopybin2 = cv::Mat::zeros(currentFrameCopy.size(), CV_8UC1 );
                     if(teamOn)
                     {
                         if(TeamColorType==1)//HSV
@@ -258,6 +390,17 @@ void ProcessingThread::run()
                         else if(TeamColorType==2)
                             cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
                         cv::inRange(currentFrameCopy,Teammin,Teammax,currentFrameCopybin);
+                        cv::erode(currentFrameCopybin,currentFrameCopybin,elementErode);
+                        cv::dilate(currentFrameCopybin,currentFrameCopybin,elementDilate);
+                        /*cv::findContours(currentFrameCopybin,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                        for(unsigned int i=0;i<contours.size();i++){
+                            //Ignore all small insignificant areasEXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                            if(cv::contourArea(contours[i])>=TeamAreamin*TeamAreamin && cv::contourArea(contours[i])<=TeamAreamax*TeamAreamax){
+                                std::vector<std::vector<cv::Point> > tcontours;
+                                tcontours.push_back(contours[i]);
+                                cv::drawContours(currentFrameCopybin2,tcontours,-1,255,CV_FILLED);
+                            }
+                        }*/
                     }
                     else if(robot1On)
                     {
@@ -266,6 +409,17 @@ void ProcessingThread::run()
                         else if(Robot1ColorType==2)
                             cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
                         cv::inRange(currentFrameCopy,Robot1min,Robot1max,currentFrameCopybin);
+                        cv::erode(currentFrameCopybin,currentFrameCopybin,elementErode);
+                        cv::dilate(currentFrameCopybin,currentFrameCopybin,elementDilate);
+                        /*cv::findContours(currentFrameCopybin,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                        for(unsigned int i=0;i<contours.size();i++){
+                            //Ignore all small insignificant areasEXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                            if(cv::contourArea(contours[i])>=Robot1Areamin*Robot1Areamin && cv::contourArea(contours[i])<=Robot1Areamax*Robot1Areamax){
+                                std::vector<std::vector<cv::Point> > tcontours;
+                                tcontours.push_back(contours[i]);
+                                cv::drawContours(currentFrameCopybin2,tcontours,-1,255,CV_FILLED);
+                            }
+                        }*/
                     }
                     else if(robot2On)
                     {
@@ -274,6 +428,17 @@ void ProcessingThread::run()
                         else if(Robot2ColorType==2)
                             cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
                         cv::inRange(currentFrameCopy,Robot2min,Robot2max,currentFrameCopybin);
+                        cv::erode(currentFrameCopybin,currentFrameCopybin,elementErode);
+                        cv::dilate(currentFrameCopybin,currentFrameCopybin,elementDilate);
+                        /*cv::findContours(currentFrameCopybin,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                        for(unsigned int i=0;i<contours.size();i++){
+                            //Ignore all small insignificant areasEXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                            if(cv::contourArea(contours[i])>=Robot2Areamin*Robot2Areamin && cv::contourArea(contours[i])<=Robot2Areamax*Robot2Areamax){
+                                std::vector<std::vector<cv::Point> > tcontours;
+                                tcontours.push_back(contours[i]);
+                                cv::drawContours(currentFrameCopybin2,tcontours,-1,255,CV_FILLED);
+                            }
+                        }*/
                     }
                     else if(ballOn)
                     {
@@ -282,6 +447,18 @@ void ProcessingThread::run()
                         else if(BallColorType==2)
                             cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
                         cv::inRange(currentFrameCopy,Ballmin,Ballmax,currentFrameCopybin);
+                        cv::erode(currentFrameCopybin,currentFrameCopybin,elementErode);
+                        cv::dilate(currentFrameCopybin,currentFrameCopybin,elementDilate);
+
+                        /*cv::findContours(currentFrameCopybin,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                        for(unsigned int i=0;i<contours.size();i++){
+                            //Ignore all small insignificant areasEXTERNAL,CV_CHAIN_APPROX_TC89_L1);
+                            if(cv::contourArea(contours[i])>=BallAreamin*BallAreamin && cv::contourArea(contours[i])<=BallAreamax*BallAreamax){
+                                std::vector<std::vector<cv::Point> > tcontours;
+                                tcontours.push_back(contours[i]);
+                                cv::drawContours(currentFrameCopybin2,tcontours,-1,255,CV_FILLED);
+                            }
+                        }*/
                     }
                     frame1=MatToQImage(currentFrameCopybin);
                 }
@@ -295,12 +472,13 @@ void ProcessingThread::run()
         updateMembersMutex.unlock();
         updateFPS(processingTime);
         currentSizeOfBuffer=imageBuffer->getSizeOfImageBuffer();
-        if(isPos)
-        {
-            angle=cv::fastAtan2(final.y-initial.y,final.x-initial.x);
-            data=QString::number(angle-180);
-            emit newData(data);
-        }
+        if(playOn)
+            if(isPos)
+            {
+                angle=cv::fastAtan2(final.y-initial.y,final.x-initial.x);
+                data=QString::number(angle-180);
+                emit newData(data);
+            }
         emit newFrame(frame);
         emit newFrame2(frame1);
     }
@@ -384,8 +562,39 @@ void ProcessingThread::updateProcessingSettings(struct ProcessingSettings proces
     BallColorType=processingSettings.BallColorType;
     Ballmin=cv::Scalar(processingSettings.BallChannel1min,processingSettings.BallChannel2min,processingSettings.BallChannel3min);
     Ballmax=cv::Scalar(processingSettings.BallChannel1max,processingSettings.BallChannel2max,processingSettings.BallChannel3max);
-    BSNumberOfIterations=processingSettings.BSNumberOfIterations;
 
+    TeamAreamin=processingSettings.TeamAreamin;
+    TeamAreamax=processingSettings.TeamAreamax;
+    Robot1Areamin=processingSettings.Robot1Areamin;
+    Robot1Areamax=processingSettings.Robot1Areamax;
+    Robot2Areamin=processingSettings.Robot2Areamin;
+    Robot2Areamax=processingSettings.Robot2Areamax;
+    BallAreamin=processingSettings.BallAreamin;
+    BallAreamax=processingSettings.BallAreamax;
+
+    SmoothType=processingSettings.SmoothType;
+    SmoothSize=processingSettings.SmoothSize;
+
+    FlipType=processingSettings.FlipType;
+    DilateType=processingSettings.DilateType;
+    DilateSize=processingSettings.DilateSize;
+    ErodeType=processingSettings.ErodeType;
+    ErodeSize=processingSettings.ErodeSize;
+
+    setDilate(DilateType,DilateSize);
+    setErode(ErodeType,ErodeSize);
+
+    psettings.TeamAreamin=processingSettings.TeamAreamin;
+    psettings.TeamAreamax=processingSettings.TeamAreamax;
+    psettings.Robot1Areamin=processingSettings.Robot1Areamin;
+    psettings.Robot1Areamax=processingSettings.Robot1Areamax;
+    psettings.Robot2Areamin=processingSettings.Robot2Areamin;
+    psettings.Robot2Areamax=processingSettings.Robot2Areamax;
+    psettings.BallAreamin=processingSettings.BallAreamin;
+    psettings.BallAreamax=processingSettings.BallAreamax;
+
+    psettings.SmoothType=processingSettings.SmoothType;
+    psettings.SmoothSize=processingSettings.SmoothSize;
     psettings.TeamColorType=processingSettings.TeamColorType;
     psettings.TeamChannel1min=processingSettings.TeamChannel1min;
     psettings.TeamChannel1max=processingSettings.TeamChannel1max;
@@ -417,6 +626,13 @@ void ProcessingThread::updateProcessingSettings(struct ProcessingSettings proces
     psettings.BallChannel2max=processingSettings.BallChannel2max;
     psettings.BallChannel3min=processingSettings.BallChannel3min;
     psettings.BallChannel3max=processingSettings.BallChannel3max;
+    psettings.SmoothType=SmoothType;
+    psettings.SmoothSize=SmoothSize;
+    psettings.FlipType=FlipType;
+    psettings.DilateType=DilateType;
+    psettings.DilateSize=DilateSize;
+    psettings.ErodeType=ErodeType;
+    psettings.ErodeSize=ErodeSize;
 } // updateProcessingSettings()
 
 void ProcessingThread::updatePosData(struct PosData posData)
@@ -427,6 +643,12 @@ void ProcessingThread::updatePosData(struct PosData posData)
     final.x=posData.final.x();
     final.y=posData.final.y();
     isPos=true;
+}
+
+void ProcessingThread::updateBSNumber(int number)
+{
+    QMutexLocker locker(&updateMembersMutex);
+    BSNumberOfIterations=number;
 }
 
 void ProcessingThread::updateTaskData(struct TaskData taskData)

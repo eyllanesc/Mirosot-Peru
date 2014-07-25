@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
+    <width>710</width>
     <height>410</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>480</width>
+    <width>710</width>
     <height>410</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>480</width>
+    <width>710</width>
     <height>410</height>
    </size>
   </property>
@@ -41,24 +41,18 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>15</x>
-     <y>14</y>
-     <width>447</width>
+     <x>20</x>
+     <y>10</y>
+     <width>662</width>
      <height>300</height>
     </rect>
-   </property>
-   <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="whatsThis">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;aaa&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="styleSheet">
     <string notr="true">a
 </string>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="BSTab">
     <attribute name="title">
@@ -69,8 +63,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>371</width>
-       <height>231</height>
+       <width>291</width>
+       <height>221</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -166,6 +160,456 @@
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QPushButton" name="BSpushButton">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>10</y>
+       <width>97</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Apply</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="BSAreamaxLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>50</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="BSAreaminLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>140</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Smoothing</string>
+    </attribute>
+    <widget class="QRadioButton" name="radioButtonBlur">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>30</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Blur</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonGauss">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>60</y>
+       <width>121</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Gaussian Blur</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonMedian">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>90</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Median Blur</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButtonBilateral">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>120</y>
+       <width>121</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Bilateral Filter</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="SmoothSizelineEdit">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>30</y>
+       <width>41</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>30</y>
+       <width>97</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Apply</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Morphology</string>
+    </attribute>
+    <widget class="QRadioButton" name="DilateCrossradioButton">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>110</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CROSS</string>
+     </property>
+     <property name="autoExclusive">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="DilateRectradioButton">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>80</y>
+       <width>109</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RECT</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="autoExclusive">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="ErodeRectradioButton">
+     <property name="geometry">
+      <rect>
+       <x>401</x>
+       <y>80</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RECT</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup_2</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="ErodeCrossradioButton">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>110</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>CROSS</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup_2</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="ErodeEllipseradioButton">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>140</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ELLIPSE</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup_2</string>
+     </attribute>
+    </widget>
+    <widget class="QRadioButton" name="DilateEllipseradioButton">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>140</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ELLIPSE</string>
+     </property>
+     <attribute name="buttonGroup">
+      <string notr="true">buttonGroup</string>
+     </attribute>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Dilate:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_19">
+     <property name="geometry">
+      <rect>
+       <x>376</x>
+       <y>20</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Erode:</string>
+     </property>
+    </widget>
+    <widget class="Line" name="line">
+     <property name="geometry">
+      <rect>
+       <x>331</x>
+       <y>20</y>
+       <width>20</width>
+       <height>191</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_20">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>50</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Type:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_21">
+     <property name="geometry">
+      <rect>
+       <x>381</x>
+       <y>50</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Type:</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="DilatelineEdit">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>80</y>
+       <width>71</width>
+       <height>33</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="ErodelineEdit">
+     <property name="geometry">
+      <rect>
+       <x>521</x>
+       <y>80</y>
+       <width>71</width>
+       <height>33</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_22">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>50</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Size:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_23">
+     <property name="geometry">
+      <rect>
+       <x>500</x>
+       <y>50</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Size:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="ApplyDilateErodepushButton">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>220</y>
+       <width>97</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Apply</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_4">
+    <attribute name="title">
+     <string>Flip</string>
+    </attribute>
+    <widget class="QLabel" name="label_24">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>30</y>
+       <width>65</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Mode:</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="NoneflipradioButton">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>60</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>None</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="xflipradioButton">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>90</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>X-axis</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="bothflipradioButton">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>150</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Both axes</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="yflipradioButton">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>120</y>
+       <width>109</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Y-axis</string>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="TeamTab">
@@ -499,6 +943,76 @@
       </property>
      </widget>
     </widget>
+    <widget class="QxtSpanSlider" name="TeamAreaqxtSpanSlider">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>70</y>
+       <width>19</width>
+       <height>86</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>555</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="lowerValue">
+      <number>0</number>
+     </property>
+     <property name="upperValue">
+      <number>555</number>
+     </property>
+     <property name="handleMovementMode">
+      <enum>QxtSpanSlider::NoCrossing</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>30</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Area:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="TeamAreamaxLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>50</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="TeamAreaminLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>140</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="Robot1Tab">
     <attribute name="title">
@@ -830,6 +1344,76 @@
        <string>YCrCb</string>
       </property>
      </widget>
+    </widget>
+    <widget class="QxtSpanSlider" name="Robot1AreaqxtSpanSlider">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>70</y>
+       <width>19</width>
+       <height>86</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>555</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="lowerValue">
+      <number>0</number>
+     </property>
+     <property name="upperValue">
+      <number>555</number>
+     </property>
+     <property name="handleMovementMode">
+      <enum>QxtSpanSlider::NoCrossing</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>30</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Area:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Robot1AreamaxLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>50</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Robot1AreaminLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>140</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="Robot2Tab">
@@ -1163,6 +1747,76 @@
       </property>
      </widget>
     </widget>
+    <widget class="QxtSpanSlider" name="Robot2AreaqxtSpanSlider">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>70</y>
+       <width>19</width>
+       <height>86</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>555</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="lowerValue">
+      <number>0</number>
+     </property>
+     <property name="upperValue">
+      <number>555</number>
+     </property>
+     <property name="handleMovementMode">
+      <enum>QxtSpanSlider::NoCrossing</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>30</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Area:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Robot2AreamaxLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>50</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="Robot2AreaminLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>140</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="BallTab">
     <attribute name="title">
@@ -1495,6 +2149,76 @@
       </property>
      </widget>
     </widget>
+    <widget class="QxtSpanSlider" name="BallAreaqxtSpanSlider">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>70</y>
+       <width>19</width>
+       <height>86</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>555</number>
+     </property>
+     <property name="singleStep">
+      <number>1</number>
+     </property>
+     <property name="lowerValue">
+      <number>0</number>
+     </property>
+     <property name="upperValue">
+      <number>555</number>
+     </property>
+     <property name="handleMovementMode">
+      <enum>QxtSpanSlider::NoCrossing</enum>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>370</x>
+       <y>30</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Area:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="BallAreamaxLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>50</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="BallAreaminLabel">
+     <property name="geometry">
+      <rect>
+       <x>440</x>
+       <y>140</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1595,7 +2319,7 @@
   <widget class="QDialogButtonBox" name="okCancelBox">
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>500</x>
      <y>370</y>
      <width>176</width>
      <height>31</height>
@@ -1637,9 +2361,9 @@
   <widget class="Line" name="line_1">
    <property name="geometry">
     <rect>
-     <x>15</x>
+     <x>20</x>
      <y>350</y>
-     <width>447</width>
+     <width>662</width>
      <height>20</height>
     </rect>
    </property>
@@ -1708,4 +2432,8 @@
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>

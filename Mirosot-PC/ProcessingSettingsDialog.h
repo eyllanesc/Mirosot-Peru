@@ -32,6 +32,7 @@ public:
 private:
     Ui::ProcessingSettingsDialog *ui;
     ProcessingSettings processingSettings;
+    int BSNumberOfIterations;
     void resetColorDialogToDefaults();
 
 public slots:
@@ -44,6 +45,7 @@ private slots:
     void resetRobot2DialogToDefaults();
     void resetBallDialogToDefaults();
     void resetBSDialogToDefaults();
+    void resetSmoothsizeDefaults();
     void on_BallChannel1qxtSpanSlider_lowerValueChanged(int lower);
     void on_BallChannel1qxtSpanSlider_upperValueChanged(int upper);
     void on_BallChannel2qxtSpanSlider_lowerValueChanged(int lower);
@@ -68,21 +70,18 @@ private slots:
     void on_Robot2Channel2qxtSpanSlider_upperValueChanged(int upper);
     void on_Robot2Channel3qxtSpanSlider_lowerValueChanged(int lower);
     void on_Robot2Channel3qxtSpanSlider_upperValueChanged(int upper);
-    void on_TeamColorRGBButton_clicked();
-    void on_TeamColorHSVButton_clicked();
-    void on_TeamColorYCrCbButton_clicked();
-    void on_Robot1ColorRGBButton_clicked();
-    void on_Robot1ColorHSVButton_clicked();
-    void on_Robot1ColorYCrCbButton_clicked();
-    void on_Robot2ColorRGBButton_clicked();
-    void on_Robot2ColorHSVButton_clicked();
-    void on_Robot2ColorYCrCbButton_clicked();
-    void on_BallColorRGBButton_clicked();
-    void on_BallColorHSVButton_clicked();
-    void on_BallColorYCrCbButton_clicked();
-
+    void on_TeamAreaqxtSpanSlider_lowerValueChanged(int lower);
+    void on_TeamAreaqxtSpanSlider_upperValueChanged(int upper);
+    void on_Robot1AreaqxtSpanSlider_lowerValueChanged(int lower);
+    void on_Robot1AreaqxtSpanSlider_upperValueChanged(int upper);
+    void on_Robot2AreaqxtSpanSlider_lowerValueChanged(int lower);
+    void on_Robot2AreaqxtSpanSlider_upperValueChanged(int upper);
+    void on_BallAreaqxtSpanSlider_lowerValueChanged(int lower);
+    void on_BallAreaqxtSpanSlider_upperValueChanged(int upper);
+    void on_BSpushButton_clicked();
 signals:
     void newProcessingSettings(struct ProcessingSettings p_settings);
+    void newNumberBS(int);
 };
 
 #endif // PROCESSINGSETTINGSDIALOG_H

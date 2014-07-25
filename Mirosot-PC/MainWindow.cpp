@@ -12,9 +12,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 {
 
     // Setup user interface
+
     ui->setupUi(this);
     isPlay=false;
+    cont=0;
     ui->ledIndicator_1->setDisabled(true);
+    ui->ledIndicator_3->setDisabled(true);
+    ui->ledIndicator_3->setOnColor1(Qt::red);
+    ui->ledIndicator_3->setOnColor2(Qt::red);
+    ui->ledIndicator_3->setOffColor1(QColor(150,0,0));
+    ui->ledIndicator_3->setOffColor2(QColor(200,0,0));
+    ui->DatapushButton->setDisabled(true);
     //ui->on_off->setText("Play");;
     //ui->playbutton->setIcon(QIcon(QPixmap("/home/edwin/Documents/MS/images/connect.png")));
     //ui->playbutton->setIconSize(QSize(25, 25));
@@ -139,6 +147,10 @@ void MainWindow::readData()
 
 }
 
+void MainWindow::updateCalibrar(const QString state)
+{
+    ui->calibrarlabel->setText(state);
+}
 void MainWindow::connectToStart()
 {
     if(QString::compare(ui->StartAction->text(),"Connect",Qt::CaseSensitive)==0)
@@ -151,6 +163,7 @@ void MainWindow::connectToStart()
         {
             ui->playbutton->setDisabled(false);
             connect(ui->playbutton,SIGNAL(clicked()),this,SLOT(play()));
+            connect(controller->processingThread,SIGNAL(newCalibration(QString)),this,SLOT(updateCalibrar(QString)));
             connect(controller->sendThread->serial, SIGNAL(readyRead()), this,SLOT(readData()),Qt::UniqueConnection);
             connect(controller->processingThread,SIGNAL(newData(QString)),this,SLOT(updateData(QString)),Qt::UniqueConnection);
             connect(controller->processingThread,SIGNAL(newFrame(QImage)),this,SLOT(updateFrame(QImage)),Qt::UniqueConnection);
@@ -165,6 +178,8 @@ void MainWindow::connectToStart()
             qRegisterMetaType<struct PosData>("PosData");
             connect(this,SIGNAL(newPosData(struct PosData)),controller->processingThread,SLOT(updatePosData(PosData)),Qt::UniqueConnection);
             connect(controller->processingThread,SIGNAL(newHistogram(QImage)),this,SLOT(setHistogram(QImage)));
+            connect(this->processingSettingsDialog,SIGNAL(newNumberBS(int)),controller->processingThread,SLOT(updateBSNumber(int)));
+            connect(ui->DatapushButton,SIGNAL(clicked()),this,SLOT(asinwrite()));
             // Set data to defaults in processingThread
             emit newProcessingFlags(processingFlags);
             emit newTaskData(taskData);
@@ -173,7 +188,7 @@ void MainWindow::connectToStart()
             // Setup imageBufferBar in main window with minimum and maximum values
             ui->imageBufferBar->setMinimum(0);
             ui->imageBufferBar->setMaximum(imageBufferSize);
-
+            ui->DatapushButton->setDisabled(false);
             ui->menuCalibration->setDisabled(false);
             ui->processingMenu->setDisabled(false);
 
@@ -340,8 +355,7 @@ void MainWindow::setBS(bool input)
 void MainWindow::updateFrame(const QImage &frame)
 {
     // Show [number of images in buffer / image buffer size] in imageBufferLabel in main window
-    ui->imageBufferLabel->setText(QString("[")+QString::number(controller->processingThread->getCurrentSizeOfBuffer())+
-                                  QString("/")+QString::number(imageBufferSize)+QString("]"));
+    ui->imageBufferLabel->setText(QString("[")+QString::number(controller->processingThread->getCurrentSizeOfBuffer())+QString("/")+QString::number(imageBufferSize)+QString("]"));
     // Show percentage of image bufffer full in imageBufferBar in main window
     ui->imageBufferBar->setValue(controller->processingThread->getCurrentSizeOfBuffer());
     // Show processing rate in captureRateLabel in main window
@@ -351,10 +365,7 @@ void MainWindow::updateFrame(const QImage &frame)
     ui->processingRateLabel->setNum(controller->processingThread->getAvgFPS());
     ui->processingRateLabel->setText(ui->processingRateLabel->text()+" fps");
     // Show ROI information in roiLabel in main window
-    ui->roiLabel->setText(QString("(")+QString::number(controller->processingThread->getCurrentROI().x)+QString(",")+
-                          QString::number(controller->processingThread->getCurrentROI().y)+QString(") ")+
-                          QString::number(controller->processingThread->getCurrentROI().width)+
-                          QString("x")+QString::number(controller->processingThread->getCurrentROI().height));
+    ui->roiLabel->setText(QString("(")+QString::number(controller->processingThread->getCurrentROI().x)+QString(",")+QString::number(controller->processingThread->getCurrentROI().y)+QString(") ")+QString::number(controller->processingThread->getCurrentROI().width)+QString("x")+QString::number(controller->processingThread->getCurrentROI().height));
     // Display frame in main window
     ui->frameLabel->setPixmap(QPixmap::fromImage(frame));
 } // updateFrame()
@@ -680,13 +691,21 @@ void MainWindow::play()
         processingFlags.playOn=false;
         ui->menuCalibration->setDisabled(false);
         ui->actionOther_Team->setDisabled(true);
+        ui->DatapushButton->setDisabled(false);
+        if(cont==2)
+            ui->ledIndicator_3->toggle();
+        cont=1;
     }
     else if(!isPlay)
     {
+        if(cont==1)
+            ui->ledIndicator_3->toggle();
+        cont=2;
         isPlay=true;
         processingFlags.playOn=true;
         ui->menuCalibration->setDisabled(true);
         ui->actionOther_Team->setDisabled(false);
+        ui->DatapushButton->setDisabled(true);
     }
     emit newProcessingFlags(processingFlags);
 }
@@ -706,4 +725,11 @@ void MainWindow::setHistogram(const QImage &hist)
 
         }
     }
+}
+
+void MainWindow::asinwrite()
+{
+    controller->sendThread->receive(ui->DatalineEdit->text());
+    ui->label_8->setText(ui->DatalineEdit->text());
+    ui->DatalineEdit->setText("");
 }

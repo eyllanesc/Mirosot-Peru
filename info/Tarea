@@ -1,7 +1,18 @@
 - Parante.
-- extensiones USB.
-- parches de colores.
-- seguidor de linea programada para un camino cuadrado.
+- Extensiones USB.
+- Parches de colores.
+- Seguidor de linea programada para un camino cuadrado.
 - Algoritmo de decodificacion: I(0-1)X(numero)Y(numero)Z(angulo)A(numero)B(numero)C(angulo);
 - Tablero de ajedrez para calibrar las medidas.
-- implementar un tipo de comunicación.
+- Implementar un tipo de comunicación.
+
+- Implementar un carro que sea manejado por la computadora vía x-bee, la trama será: "D-V-D-V-...-D-V;"
+	-D: Dirección hacia se tiene que dirigir.
+		-U: adelante
+		-D: atrás
+		-L: izquierda
+		-R: derecha
+	-V: Distancia que tiene que recoger (en cm y cantidad de dígitos variable).
+	-;: Fin de trama.
+La cantidad de comandos es variable.
+

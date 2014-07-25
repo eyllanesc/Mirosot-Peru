@@ -7,6 +7,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <opencv2/opencv.hpp>
 // Image buffer size
 #define DEFAULT_IMAGE_BUFFER_SIZE 1
 
@@ -21,7 +22,16 @@
 
 // BS
 #define DEFAULT_BS_ITERATIONS 100
+#define AREAMIN_BS  50
+#define AREAMAX_BS  500
+
+#define DEFAULT_SMOOTH_ITERATIONS 1
 
 #define LAMBDA 3.5
+
+#define NFLIP    2
+#define XFLIP   0
+#define YFLIP   1
+#define BFLIP   -1
 
 #endif // CONFIG_H

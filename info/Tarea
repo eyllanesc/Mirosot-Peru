@@ -6,7 +6,8 @@
 - Tablero de ajedrez para calibrar las medidas.
 - Implementar un tipo de comunicación.
 
-- Implementar un carro que sea manejado por la computadora vía x-bee, la trama será: "D-V-D-V-...-D-V;"
+- Implementar un carro que sea manejado por la computadora vía x-bee, la trama será: "SDVDV...DV;"
+	-S: "S" byte de inicio
 	-D: Dirección hacia se tiene que dirigir.
 		-U: adelante
 		-D: atrás

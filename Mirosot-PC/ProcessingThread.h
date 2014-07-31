@@ -66,6 +66,23 @@ private:
     cv::Mat elementErode;
     cv::Rect campROI;
 
+    cv::Scalar mymeanteam;
+    cv::Scalar mystdteam;
+
+    cv::Scalar mymeanrobot1;
+    cv::Scalar mystdrobot1;
+
+    cv::Scalar mymeanrobot2;
+    cv::Scalar mystdrobot2;
+
+    cv::Scalar mymeanball;
+    cv::Scalar mystdball;
+
+    int sSizeteam;
+    int sSizerobot1;
+    int sSizerobot2;
+    int sSizeball;
+
     cv::Scalar meantmp;
     cv::Scalar stdtmp;
 
@@ -152,6 +169,10 @@ private slots:
     void updateTaskData(struct TaskData);
     void updatePosData(struct PosData);
     void updateBSNumber(int);
+    void resetteam();
+    void resetrobot1();
+    void resetrobot2();
+    void resetball();
 signals:
     void newFrame(const QImage &frame);
     void newFrame2(const QImage &frame);

@@ -10,10 +10,14 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-
-    // Setup user interface
-
     ui->setupUi(this);
+    // Setup user interface
+    qmessabox = new QMessageBox();
+    qmessabox->setIcon(QMessageBox::Question);
+    qmessabox->setText("Ud. esta seguro?");
+    qmessabox->addButton(QMessageBox::Yes);
+    qmessabox->addButton(QMessageBox::No);
+    qmessabox->setWindowTitle("Question");
     isPlay=false;
     cont=0;
     ui->ledIndicator_1->setDisabled(true);
@@ -24,9 +28,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     ui->ledIndicator_3->setOffColor2(QColor(200,0,0));
     ui->DatapushButton->setDisabled(true);
     //ui->on_off->setText("Play");;
-    //ui->playbutton->setIcon(QIcon(QPixmap("/home/edwin/Documents/MS/images/connect.png")));
-    //ui->playbutton->setIconSize(QSize(25, 25));
-    //ui->playbutton->setStyleSheet("QPushButton{border: none;outline: none;}");
+    ui->playbutton->setIcon(QIcon(QPixmap(":/images/BotonMirosotdownv1.1.png")));
+    ui->playbutton->setIconSize(QSize(100, 100));
+    ui->playbutton->setStyleSheet("QPushButton{border: none;outline: none;}");
     //ui->playbutton->move(1080,500);
     ui->playbutton->setDisabled(true);
     ui->actionOther_Team->setDisabled(true);
@@ -180,6 +184,10 @@ void MainWindow::connectToStart()
             connect(controller->processingThread,SIGNAL(newHistogram(QImage)),this,SLOT(setHistogram(QImage)));
             connect(this->processingSettingsDialog,SIGNAL(newNumberBS(int)),controller->processingThread,SLOT(updateBSNumber(int)));
             connect(ui->DatapushButton,SIGNAL(clicked()),this,SLOT(asinwrite()));
+            connect(this->processingSettingsDialog,SIGNAL(resetSteam()),controller->processingThread,SLOT(resetteam()));
+            connect(this->processingSettingsDialog,SIGNAL(resetSrobot1()),controller->processingThread,SLOT(resetrobot1()));
+            connect(this->processingSettingsDialog,SIGNAL(resetSrobot2()),controller->processingThread,SLOT(resetrobot2()));
+            connect(this->processingSettingsDialog,SIGNAL(resetSball()),controller->processingThread,SLOT(resetball()));
             // Set data to defaults in processingThread
             emit newProcessingFlags(processingFlags);
             emit newTaskData(taskData);
@@ -436,15 +444,24 @@ void MainWindow::newMouseData(struct MouseData mouseData)
                 // Set setROIFlag to TRUE
                 taskData.setROIFlag=true;
                 // Update task data in processingThread
-
                 posData.initial.setX(mouseData.initial.x());
                 posData.initial.setY(mouseData.initial.y());
                 posData.final.setX(mouseData.final.x());
                 posData.final.setY(mouseData.final.y());
-
-                emit newPosData(posData);
-                emit newTaskData(taskData);
-
+                if(!isPlay && (processingFlags.teamOn || processingFlags.robot1On || processingFlags.robot2On || processingFlags.ballOn))
+                {
+                    qmessabox->exec();
+                    if(qmessabox->clickedButton()==qmessabox->button(QMessageBox::Yes))
+                    {
+                        emit newTaskData(taskData);
+                        emit newPosData(posData);
+                    }
+                }
+                else
+                {
+                    emit newTaskData(taskData);
+                    emit newPosData(posData);
+                }
                 // Set setROIFlag to FALSE
                 taskData.setROIFlag=false;
             }
@@ -693,8 +710,11 @@ void MainWindow::play()
         ui->actionOther_Team->setDisabled(true);
         ui->DatapushButton->setDisabled(false);
         if(cont==2)
+        {
             ui->ledIndicator_3->toggle();
-        cont=1;
+            ui->playbutton->setIcon(QIcon(QPixmap(":/images/BotonMirosotdownv1.1.png")));
+        }
+            cont=1;
     }
     else if(!isPlay)
     {
@@ -702,6 +722,7 @@ void MainWindow::play()
             ui->ledIndicator_3->toggle();
         cont=2;
         isPlay=true;
+        ui->playbutton->setIcon(QIcon(QPixmap(":/images/BotonMirosotupv1.1.png")));
         processingFlags.playOn=true;
         ui->menuCalibration->setDisabled(true);
         ui->actionOther_Team->setDisabled(false);

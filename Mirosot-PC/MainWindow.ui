@@ -12,8 +12,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1350</width>
-    <height>680</height>
+    <width>1310</width>
+    <height>660</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,14 +24,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1350</width>
-    <height>680</height>
+    <width>1310</width>
+    <height>660</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>1350</width>
-    <height>680</height>
+    <width>1310</width>
+    <height>660</height>
    </size>
   </property>
   <property name="font">
@@ -87,18 +87,57 @@
      <height>0</height>
     </size>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QRadioButton" name="radioButton_2">
     <property name="geometry">
      <rect>
-      <x>21</x>
-      <y>21</y>
-      <width>1310</width>
-      <height>601</height>
+      <x>580</x>
+      <y>0</y>
+      <width>66</width>
+      <height>21</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_8">
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Robot2</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>0</y>
+      <width>66</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Robot1</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>20</y>
+      <width>1284</width>
+      <height>603</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_6">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item>
         <widget class="FrameLabel" name="frameLabel">
          <property name="enabled">
@@ -112,8 +151,14 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>642</width>
-           <height>482</height>
+           <width>640</width>
+           <height>480</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>640</width>
+           <height>480</height>
           </size>
          </property>
          <property name="mouseTracking">
@@ -137,7 +182,54 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <widget class="FrameLabel" name="frameLabel_2">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>640</width>
+           <height>480</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>640</width>
+           <height>480</height>
+          </size>
+         </property>
+         <property name="mouseTracking">
+          <bool>true</bool>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <property name="lineWidth">
+          <number>1</number>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <spacer name="horizontalSpacer_4">
            <property name="orientation">
@@ -698,7 +790,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>13</width>
+             <width>20</width>
              <height>20</height>
             </size>
            </property>
@@ -706,69 +798,10 @@
          </item>
         </layout>
        </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="Line" name="line">
-       <property name="minimumSize">
-        <size>
-         <width>10</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>10</width>
-         <height>1000</height>
-        </size>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="FrameLabel" name="frameLabel_2">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>640</width>
-           <height>480</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>640</width>
-           <height>480</height>
-          </size>
-         </property>
-         <property name="mouseTracking">
-          <bool>true</bool>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Box</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <property name="lineWidth">
-          <number>1</number>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -781,8 +814,8 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>27</width>
-             <height>17</height>
+             <width>20</width>
+             <height>20</height>
             </size>
            </property>
           </spacer>
@@ -811,10 +844,23 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="DatalineEdit"/>
+              <widget class="QLineEdit" name="DatalineEdit">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>22</height>
+                </size>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QPushButton" name="DatapushButton">
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>25</height>
+                </size>
+               </property>
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -970,6 +1016,12 @@
                </property>
                <property name="text">
                 <string/>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>56</width>
+                 <height>26</height>
+                </size>
                </property>
               </widget>
              </item>
@@ -1214,7 +1266,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1350</width>
+     <width>1310</width>
      <height>27</height>
     </rect>
    </property>

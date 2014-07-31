@@ -30,9 +30,9 @@ SOURCES += main.cpp\
     ProcessingSettingsDialog.cpp \
     MatToQImage.cpp \
     settingsdialog.cpp \
-    SendThread.cpp \
     qledindicator.cpp \
-    histogram.cpp
+    histogram.cpp \
+    SendThread.cpp
 
 HEADERS  += MainWindow.h \
     CaptureThread.h \
@@ -46,9 +46,9 @@ HEADERS  += MainWindow.h \
     Config.h \
     MatToQImage.h \
     settingsdialog.h \
-    SendThread.h \
     qledindicator.h \
-    histogram.h
+    histogram.h \
+    SendThread.h
 
 unix: CONFIG += link_pkgconfig \
     serialport

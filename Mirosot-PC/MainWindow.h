@@ -52,6 +52,7 @@ private:
     Controller *controller;
     Histogram *histogram;
 
+    QMessageBox *qmessabox;
     int cont;
 
     ProcessingFlags processingFlags;

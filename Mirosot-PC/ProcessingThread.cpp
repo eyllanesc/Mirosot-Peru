@@ -32,6 +32,11 @@ ProcessingThread::ProcessingThread(ImageBuffer *imageBuffer, int inputSourceWidt
     DilateType=1;
     DilateSize=1;
 
+    sSizeteam=0;
+    sSizerobot1=0;
+    sSizerobot2=0;
+    sSizeball=0;
+
     BSNumberOfIterations=DEFAULT_BS_ITERATIONS;
     // Initialize currentROI variable
     currentROI=cv::Rect(0,0,inputSourceWidth,inputSourceHeight);
@@ -45,6 +50,15 @@ ProcessingThread::ProcessingThread(ImageBuffer *imageBuffer, int inputSourceWidt
     final.y=-10;
     setDilate(DilateType,DilateSize);
     setErode(ErodeType,ErodeSize);
+
+    mymeanteam=0;
+    mymeanrobot1=0;
+    mymeanrobot2=0;
+    mymeanball=0;
+    mystdteam=0;
+    mystdrobot1=0;
+    mystdrobot2=0;
+    mystdball=0;
 } // ProcessingThread constructor
 
 ProcessingThread::~ProcessingThread()
@@ -67,6 +81,7 @@ void ProcessingThread::run()
     bg.set("nmixtures",7);
     bg.set("detectShadows",true);
 
+    double w;
     cv::Mat fore;
     std::vector<cv::Mat> bgr_planes;
     int histSize = 256;
@@ -102,25 +117,15 @@ void ProcessingThread::run()
         currentFrame.copyTo(currentFrameCopy2);
         //cv::flip(currentFrameCopy2,currentFrameCopy2,-1);
         if(SmoothType==0)
-        {
             cv::blur(currentFrameCopy2, currentFrameCopy, cv::Size( 2*SmoothSize+1, 2*SmoothSize+1), cv::Point(-1,-1));
-        }
         else if(SmoothType==1)
-        {
             cv::GaussianBlur( currentFrameCopy2, currentFrameCopy, cv::Size( 2*SmoothSize+1, 2*SmoothSize+1 ), 0, 0 );
-        }
         else if(SmoothType==2)
-        {
             cv::medianBlur(currentFrameCopy2, currentFrameCopy, 2*SmoothSize+1 );
-        }
         else if(SmoothType==3)
-        {
-            cv::bilateralFilter (currentFrameCopy2, currentFrameCopy, 2*SmoothSize+1, (2*SmoothSize+1)*2, (2*SmoothSize+1)/2 );;
-        }
+            cv::bilateralFilter (currentFrameCopy2, currentFrameCopy, 2*SmoothSize+1, (2*SmoothSize+1)*2, (2*SmoothSize+1)/2 );
         else
-        {
             currentFrameCopy2.copyTo(currentFrameCopy);
-        }
 
         if(FlipType!=NFLIP)
             cv::flip(currentFrameCopy,currentFrameCopy,FlipType);
@@ -132,7 +137,12 @@ void ProcessingThread::run()
         // PERFORM TASKS //
         ///////////////////
         if(resetROIFlag)
+        {
             resetROI();
+            if(!playOn)
+                if(campOn)
+                    campROI=currentROI;
+        }
         else if(setROIFlag)
         {
             setROI();
@@ -152,8 +162,15 @@ void ProcessingThread::run()
                         else if(TeamColorType==2)
                             cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
                         cv::meanStdDev(currentFrameCopy,meantmp,stdtmp);
-                        Teammin=cv::Scalar(int(meantmp.val[0]-LAMBDA*stdtmp.val[0]),int(meantmp.val[1]-LAMBDA*stdtmp.val[1]),int(meantmp.val[2]-LAMBDA*stdtmp.val[2]));
-                        Teammax=cv::Scalar(int(meantmp.val[0]+LAMBDA*stdtmp.val[0]),int(meantmp.val[1]+LAMBDA*stdtmp.val[1]),int(meantmp.val[2]+LAMBDA*stdtmp.val[2]));
+                        w=(double)currentFrameCopy.cols*currentFrameCopy.rows/(currentFrameCopy.cols*currentFrameCopy.rows+sSizeteam);
+                        sSizeteam+=currentFrameCopy.cols*currentFrameCopy.rows;
+                        for(int ch=0; ch<currentFrameCopy.channels();ch++)
+                        {
+                            mystdteam.val[ch]=sqrt(stdtmp.val[ch]*stdtmp.val[ch]*w+(1-w)*mystdteam.val[ch]*mystdteam.val[ch]+w*(1-w)*(mymeanteam.val[ch]-meantmp.val[ch])*(mymeanteam.val[ch]-meantmp.val[ch]));
+                            mymeanteam.val[ch]+=w*(meantmp.val[ch]-mymeanteam.val[ch]);
+                        }
+                        Teammin=cv::Scalar(int(mymeanteam.val[0]-LAMBDA*mystdteam.val[0]),int(mymeanteam.val[1]-LAMBDA*mystdteam.val[1]),int(mymeanteam.val[2]-LAMBDA*mystdteam.val[2]));
+                        Teammax=cv::Scalar(int(mymeanteam.val[0]+LAMBDA*mystdteam.val[0]),int(mymeanteam.val[1]+LAMBDA*mystdteam.val[1]),int(mymeanteam.val[2]+LAMBDA*mystdteam.val[2]));
                         psettings.TeamColorType=TeamColorType;
                         psettings.TeamChannel1min=Teammin.val[0];
                         psettings.TeamChannel1max=Teammax.val[0];
@@ -170,8 +187,15 @@ void ProcessingThread::run()
                         else if(Robot1ColorType ==2)
                             cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
                         cv::meanStdDev(currentFrameCopy,meantmp,stdtmp);
-                        Robot1min=cv::Scalar(int(meantmp.val[0]-LAMBDA*stdtmp.val[0]),int(meantmp.val[1]-LAMBDA*stdtmp.val[1]),int(meantmp.val[2]-LAMBDA*stdtmp.val[2]));
-                        Robot1max=cv::Scalar(int(meantmp.val[0]+LAMBDA*stdtmp.val[0]),int(meantmp.val[1]+LAMBDA*stdtmp.val[1]),int(meantmp.val[2]+LAMBDA*stdtmp.val[2]));
+                        w=(double)currentFrameCopy.cols*currentFrameCopy.rows/(currentFrameCopy.cols*currentFrameCopy.rows+sSizerobot1);
+                        sSizerobot1+=currentFrameCopy.cols*currentFrameCopy.rows;
+                        for(int ch=0; ch<currentFrameCopy.channels();ch++)
+                        {
+                            mystdrobot1.val[ch]=sqrt(stdtmp.val[ch]*stdtmp.val[ch]*w+(1-w)*mystdrobot1.val[ch]*mystdrobot1.val[ch]+w*(1-w)*(mymeanrobot1.val[ch]-meantmp.val[ch])*(mymeanrobot1.val[ch]-meantmp.val[ch]));
+                            mymeanrobot1.val[ch]+=w*(meantmp.val[ch]-mymeanrobot1.val[ch]);
+                        }
+                        Robot1min=cv::Scalar(int(mymeanrobot1.val[0]-LAMBDA*mystdrobot1.val[0]),int(mymeanrobot1.val[1]-LAMBDA*mystdrobot1.val[1]),int(mymeanrobot1.val[2]-LAMBDA*mystdrobot1.val[2]));
+                        Robot1max=cv::Scalar(int(mymeanrobot1.val[0]+LAMBDA*mystdrobot1.val[0]),int(mymeanrobot1.val[1]+LAMBDA*mystdrobot1.val[1]),int(mymeanrobot1.val[2]+LAMBDA*mystdrobot1.val[2]));
                         psettings.Robot1ColorType=Robot1ColorType;
                         psettings.Robot1Channel1min=Robot1min.val[0];
                         psettings.Robot1Channel1max=Robot1max.val[0];
@@ -188,9 +212,16 @@ void ProcessingThread::run()
                         else if(Robot2ColorType ==2)
                             cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
                         cv::meanStdDev(currentFrameCopy,meantmp,stdtmp);
+                        w=(double)currentFrameCopy.cols*currentFrameCopy.rows/(currentFrameCopy.cols*currentFrameCopy.rows+sSizerobot2);
+                        sSizerobot2+=currentFrameCopy.cols*currentFrameCopy.rows;
+                        for(int ch=0; ch<currentFrameCopy.channels();ch++)
+                        {
+                            mystdrobot2.val[ch]=sqrt(w*stdtmp.val[ch]*stdtmp.val[ch]+(1-w)*mystdrobot2.val[ch]*mystdrobot2.val[ch]+w*(1-w)*(mymeanrobot2.val[ch]-meantmp.val[ch])*(mymeanrobot2.val[ch]-meantmp.val[ch]));
+                            mymeanrobot2.val[ch]+=w*(meantmp.val[ch]-mymeanrobot2.val[ch]);
+                        }
                         psettings.Robot2ColorType=Robot2ColorType;
-                        Robot2min=cv::Scalar(int(meantmp.val[0]-LAMBDA*stdtmp.val[0]),int(meantmp.val[1]-LAMBDA*stdtmp.val[1]),int(meantmp.val[2]-LAMBDA*stdtmp.val[2]));
-                        Robot2max=cv::Scalar(int(meantmp.val[0]+LAMBDA*stdtmp.val[0]),int(meantmp.val[1]+LAMBDA*stdtmp.val[1]),int(meantmp.val[2]+LAMBDA*stdtmp.val[2]));
+                        Robot2min=cv::Scalar(int(mymeanrobot2.val[0]-LAMBDA*mystdrobot2.val[0]),int(mymeanrobot2.val[1]-LAMBDA*mystdrobot2.val[1]),int(mymeanrobot2.val[2]-LAMBDA*mystdrobot2.val[2]));
+                        Robot2max=cv::Scalar(int(mymeanrobot2.val[0]+LAMBDA*mystdrobot2.val[0]),int(mymeanrobot2.val[1]+LAMBDA*mystdrobot2.val[1]),int(mymeanrobot2.val[2]+LAMBDA*mystdrobot2.val[2]));
                         psettings.Robot2Channel1min=Robot2min.val[0];
                         psettings.Robot2Channel1max=Robot2max.val[0];
                         psettings.Robot2Channel2min=Robot2min.val[1];
@@ -206,8 +237,15 @@ void ProcessingThread::run()
                         else if(BallColorType ==2)
                             cv::cvtColor(currentFrameCopy,currentFrameCopy,cv::COLOR_RGB2YCrCb);
                         cv::meanStdDev(currentFrameCopy,meantmp,stdtmp);
-                        Ballmin=cv::Scalar(int(meantmp.val[0]-LAMBDA*stdtmp.val[0]),int(meantmp.val[1]-LAMBDA*stdtmp.val[1]),int(meantmp.val[2]-LAMBDA*stdtmp.val[2]));
-                        Ballmax=cv::Scalar(int(meantmp.val[0]+LAMBDA*stdtmp.val[0]),int(meantmp.val[1]+LAMBDA*stdtmp.val[1]),int(meantmp.val[2]+LAMBDA*stdtmp.val[2]));
+                        w=(double)currentFrameCopy.cols*currentFrameCopy.rows/(currentFrameCopy.cols*currentFrameCopy.rows+sSizeball);
+                        sSizeball+=currentFrameCopy.cols*currentFrameCopy.rows;
+                        for(int ch=0; ch<currentFrameCopy.channels();ch++)
+                        {
+                            mystdball.val[ch]=sqrt(stdtmp.val[ch]*stdtmp.val[ch]*w+(1-w)*mystdball.val[ch]*mystdball.val[ch]+w*(1-w)*(mymeanball.val[ch]-meantmp.val[ch])*(mymeanball.val[ch]-meantmp.val[ch]));
+                            mymeanball.val[ch]+=w*(meantmp.val[ch]-mymeanball.val[ch]);
+                        }
+                        Ballmin=cv::Scalar(int(mymeanball.val[0]-LAMBDA*mystdball.val[0]),int(mymeanball.val[1]-LAMBDA*mystdball.val[1]),int(mymeanball.val[2]-LAMBDA*mystdball.val[2]));
+                        Ballmax=cv::Scalar(int(mymeanball.val[0]+LAMBDA*mystdball.val[0]),int(mymeanball.val[1]+LAMBDA*mystdball.val[1]),int(mymeanball.val[2]+LAMBDA*mystdball.val[2]));
                         psettings.BallColorType=BallColorType;
                         psettings.BallChannel1min=Ballmin.val[0];
                         psettings.BallChannel1max=Ballmax.val[0];
@@ -303,10 +341,10 @@ void ProcessingThread::run()
                     cv::Point2f rect_points[4];
                     minRectRobot1[i].points(rect_points);
                     for( int j = 0; j < 4; j++ )
-                        cv::line( currentFrameCopy, rect_points[j], rect_points[(j+1)%4], cv::Scalar(0,0,255), 1,CV_AA);
+                        cv::line( currentFrameCopy, rect_points[j], rect_points[(j+1)%4], cv::Scalar(255,0,0), 1,CV_AA);
                 }
                 if(!mc1.empty())
-                    cv::putText(currentFrameCopy, "Robot1", mc1[0], CV_FONT_HERSHEY_PLAIN, 0.6,cv::Scalar(255, 0, 0), 1, 2 );
+                    cv::putText(currentFrameCopy, "Robot1", mc1[0], CV_FONT_HERSHEY_PLAIN, 0.6,cv::Scalar(0, 0, 255), 1, 2 );
 
                 //Obtencion de Robot2
                 if(Robot2ColorType==0)
@@ -680,3 +718,34 @@ cv::Rect ProcessingThread::getCurrentROI()
 {
     return currentROI;
 } // getCurrentROI();
+
+void ProcessingThread::resetteam()
+{
+    QMutexLocker locker(&updateMembersMutex);
+    sSizeteam=0;
+    mymeanteam.all(0);
+    mystdteam.all(0);
+}
+
+void ProcessingThread::resetrobot1()
+{
+    QMutexLocker locker(&updateMembersMutex);
+    sSizerobot1=0;
+    mymeanrobot1.all(0);
+    mystdrobot1.all(0);
+}
+
+void ProcessingThread::resetrobot2()
+{
+    QMutexLocker locker(&updateMembersMutex);
+    sSizerobot2=0;
+    mymeanrobot2.all(0);
+    mystdrobot2.all(0);
+}
+void ProcessingThread::resetball()
+{
+    QMutexLocker locker(&updateMembersMutex);
+    sSizeball=0;
+    mymeanball.all(0);
+    mystdball.all(0);
+}

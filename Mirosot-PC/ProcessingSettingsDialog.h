@@ -82,6 +82,10 @@ private slots:
 signals:
     void newProcessingSettings(struct ProcessingSettings p_settings);
     void newNumberBS(int);
+    void resetSteam();
+    void resetSrobot1();
+    void resetSrobot2();
+    void resetSball();
 };
 
 #endif // PROCESSINGSETTINGSDIALOG_H

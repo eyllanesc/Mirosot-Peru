@@ -253,6 +253,7 @@ void ProcessingSettingsDialog::resetTeamDialogToDefaults()
 
     ui->TeamAreaminLabel->setText(QString::number(ui->TeamAreaqxtSpanSlider->lowerValue()));
     ui->TeamAreamaxLabel->setText(QString::number(ui->TeamAreaqxtSpanSlider->upperValue()));
+    emit resetSteam();
 }
 
 void ProcessingSettingsDialog::resetRobot1DialogToDefaults()
@@ -280,6 +281,7 @@ void ProcessingSettingsDialog::resetRobot1DialogToDefaults()
 
     ui->Robot1AreaminLabel->setText(QString::number(ui->Robot1AreaqxtSpanSlider->lowerValue()));
     ui->Robot1AreamaxLabel->setText(QString::number(ui->Robot1AreaqxtSpanSlider->upperValue()));
+    emit resetSrobot1();
 }
 
 void ProcessingSettingsDialog::resetRobot2DialogToDefaults()
@@ -307,6 +309,7 @@ void ProcessingSettingsDialog::resetRobot2DialogToDefaults()
 
     ui->Robot2AreaminLabel->setText(QString::number(ui->Robot2AreaqxtSpanSlider->lowerValue()));
     ui->Robot2AreamaxLabel->setText(QString::number(ui->Robot2AreaqxtSpanSlider->upperValue()));
+    emit resetSrobot2();
 }
 
 void ProcessingSettingsDialog::resetBallDialogToDefaults()
@@ -334,6 +337,7 @@ void ProcessingSettingsDialog::resetBallDialogToDefaults()
 
     ui->BallAreaminLabel->setText(QString::number(ui->BallAreaqxtSpanSlider->lowerValue()));
     ui->BallAreamaxLabel->setText(QString::number(ui->BallAreaqxtSpanSlider->upperValue()));
+    emit resetSball();
 }
 
 void ProcessingSettingsDialog::resetColorDialogToDefaults()

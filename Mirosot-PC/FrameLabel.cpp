@@ -79,6 +79,7 @@ void FrameLabel::mouseReleaseEvent(QMouseEvent *ev)
     // On right mouse button release
     else if(ev->button()==Qt::RightButton)
     {
+
         // If user presses (and then releases) the right mouse button while drawing box, stop drawing box
         if(drawBox)
             drawBox=false;

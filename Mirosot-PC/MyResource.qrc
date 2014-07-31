@@ -8,5 +8,7 @@
         <file>images/serial.jpg</file>
         <file>images/Qt-logo.png</file>
         <file>images/logo.png</file>
+        <file>images/BotonMirosotdownv1.1.png</file>
+        <file>images/BotonMirosotupv1.1.png</file>
     </qresource>
 </RCC>

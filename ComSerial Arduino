@@ -1,0 +1,144 @@
+char entrada;
+int s_actual = 0;
+int izquierda_PWM = 5; // PWM Motor1
+int izquierda_D = 4; // Direccion Motor1
+int derecha_PWM = 6; // PWM Motor2
+int derecha_D = 7; // Direccion Motor2
+int indicaciones[10][2];
+int contador = 0;
+
+void giro_derecha(int t_giro, int t){
+   digitalWrite(izquierda_PWM, HIGH);
+   digitalWrite(izquierda_D, LOW);
+   digitalWrite(derecha_PWM, HIGH);
+   digitalWrite(derecha_D, HIGH);
+   delay(t_giro);
+   digitalWrite(derecha_D, LOW);
+   delay(t);
+   digitalWrite(derecha_PWM, LOW);
+   digitalWrite(izquierda_PWM, LOW);
+}
+
+void giro_izquierda(int t_giro, int t){
+   digitalWrite(izquierda_PWM, HIGH);
+   digitalWrite(izquierda_D, HIGH);
+   digitalWrite(derecha_PWM, HIGH);
+   digitalWrite(derecha_D, LOW);
+   delay(t_giro);
+   digitalWrite(izquierda_D, LOW);
+   delay(t);
+   digitalWrite(derecha_PWM, LOW);
+   digitalWrite(izquierda_PWM, LOW);
+}
+
+void avance(int t){
+   digitalWrite(izquierda_PWM, HIGH);
+   digitalWrite(derecha_PWM, HIGH);
+   digitalWrite(derecha_D, LOW);
+   digitalWrite(izquierda_D, LOW);
+   delay(t);
+   digitalWrite(izquierda_PWM, LOW);
+   digitalWrite(derecha_PWM, LOW);
+}
+
+void retroceso(int t){
+  digitalWrite(derecha_PWM, HIGH);
+  digitalWrite(izquierda_PWM, HIGH);
+  digitalWrite(derecha_D, HIGH);
+  digitalWrite(izquierda_D, HIGH);
+  delay(t);
+  digitalWrite(derecha_PWM, LOW);
+  digitalWrite(izquierda_PWM, LOW);
+}
+
+void movimiento(int x[10][2], int contador)
+{
+for (int i = 0;  i < contador; i++){
+  if (x[i][0] == 'F'){
+    avance(1000);}
+  else if (x[i][0] == 'B'){
+    retroceso(1000);}
+  else if (x[i][0] == 'L'){
+    giro_izquierda(300, 1000);}
+  else if (x[i][0] == 'R'){
+    giro_derecha(300, 1000);}
+}
+}
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(izquierda_PWM, OUTPUT);
+  pinMode(derecha_PWM, OUTPUT);
+  pinMode(izquierda_D, OUTPUT);
+  pinMode(derecha_D, OUTPUT);
+}
+
+void loop()
+{
+  if (Serial.available() > 0) {
+     entrada = Serial.read();
+       switch (s_actual) {
+         
+         case 0:
+           if (entrada == 'S') {
+             s_actual = 1;
+             Serial.println("Recibido");
+           }
+           else {
+             s_actual = 0;
+             Serial.println("Incorrecto");
+           }
+           break;
+          
+         case 1:
+            if (entrada == 'F' || entrada == 'B' || entrada == 'L' || entrada == 'R'){
+              s_actual = 2;
+              indicaciones[contador][0] = entrada;
+              contador = contador + 1;
+              Serial.println("Recibido");
+            }
+            else {
+              s_actual = 0;
+              Serial.println("Incorrecto");
+            }
+            break;
+              
+          case 2:
+            if (entrada == '0' || entrada == '1' || entrada == '2' || entrada == '3' || entrada == '4' || entrada == '5' || entrada == '6' || entrada == '7' || entrada == '8' || entrada == '9'){
+              s_actual = 3;
+              indicaciones[contador][1] = entrada-48;
+              Serial.println("Recibido");
+            }
+            else {
+              s_actual = 0;
+              Serial.println("Incorrecto");
+            }
+            break;
+              
+          case 3:
+            if (entrada == '0' || entrada == '1' || entrada == '2' || entrada == '3' || entrada == '4' || entrada == '5' || entrada == '6' || entrada == '7' || entrada == '8' || entrada == '9'){
+              s_actual = 3;
+              indicaciones[contador][1] = (indicaciones[contador][1])*10 + entrada-48;
+              Serial.println("Recibido");
+            }
+            else if (entrada == 'F' || entrada == 'B' || entrada == 'L' || entrada == 'R'){
+              s_actual = 2;
+              indicaciones[contador][0] = entrada;
+              contador = contador + 1;
+              Serial.println("Recibido");
+            }
+            else if (entrada == ';'){
+              s_actual = 0;
+              movimiento(indicaciones, contador);
+              contador = 0;
+              Serial.println("Correcto");
+            }
+            else {
+              s_actual = 0;
+              Serial.println("Incorrecto");
+            }
+            break;
+     }
+   }
+}

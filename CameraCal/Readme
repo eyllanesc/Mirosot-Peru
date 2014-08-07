@@ -1,0 +1,2 @@
+This source file is a sample of opencv
+Input is: -w 7 -h 7 -n 25 -s 45  -o camera.yml -op -oe
